@@ -2,6 +2,8 @@
 
 **qrdump**: a tool for dumping data into a series of qr-codes for long-time archiving.
 
+:warning: :construction: **this is a very recent repo very much under construction; consider waiting a bit before starting to use the code here; contributions / feedback / code reviews welcome though :construction: :warning:
+
 The platformed aimed for is linux. The code is a set of bash scripts leveraging standard linux packages.
 
 The aim of this repository is to provide a default-solution for dumping data into a series of QR-codes together with metadata, with the aim of long-term archiving. Examples of applications include dumping GPG private keys for long-time storage, dumping encrypted pass password manager content, or simply any long time archiving of numerical data.
