@@ -55,7 +55,7 @@ give_access
 head -c 4096 </dev/urandom > dummy_file.dat
 
 # TODO: take sha of it
-DIGEST_IN=$(sha512sum dummy_file.dat | awk '{print $1;}' | xxd -r -ps)
+DIGEST_IN=$(sha512sum dummy_file.dat | awk '{print $1;}')
 echo "digest of the random file:"
 echo ${DIGEST_IN}
 
@@ -66,9 +66,8 @@ echo "encoding finished"
 echo "clean the initial file"
 mv dummy_file.dat dummy_file_start.dat
 
-# need to sleep a bit to make sure all files well written
-sleep 5
-
+# TODO: wonder if some sort of delay needed here to make sure files are copied etc
+# and to avoid base64 problem?
 
 cd ..
 
@@ -80,7 +79,7 @@ bash ./qrdump.sh --base64 -b -d -v dummy
 
 echo "decoding finished"
 press_any
-DIGEST_OUT=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}' | xxd -r -ps)
+DIGEST_OUT=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
 echo "digest of the decrypted file:"
 echo ${DIGEST_OUT}
 
