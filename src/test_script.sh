@@ -68,6 +68,8 @@ mv dummy_file.dat dummy_file_start.dat
 
 # TODO: wonder if some sort of delay needed here to make sure files are copied etc
 # and to avoid base64 problem?
+echo "WAIT SO THAT FILES ARE FULLY COPIED, OTHERWISE ERROR"
+sleep 10
 
 cd ..
 

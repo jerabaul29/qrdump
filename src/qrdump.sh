@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: make sure null bytes do not break stuff!
+
 # TODO: metadata: put zbarimg
 
 # TODO: make it work in base64 encoding: dumping + extraction of metadata + 1 qr code
@@ -396,9 +398,20 @@ show_debug_variable "SIZE_DIGEST"
 MAX_QR_SIZE=403
 show_debug_variable "MAX_QR_SIZE"
 
+# the rank size in the data QR metadata
+# TODO: allow to change if necessary
+SIZE_RANK=2
+
+# size of the ID
+# TODO: make it argument
+SIZE_ID=8
+
 # TODO: make this full logics
 # TODO: both the general ID (8 bytes) and the rank (2 bytes, TODO: make adaptable) should be made into logics
-CONTENT_QR_CODE_BYTES=$((${MAX_QR_SIZE}-${SIZE_DIGEST}-2-8))
+SIZE_DATAQR_METADATA=$((${SIZE_DIGEST}+${SIZE_RANK}+${SIZE_ID}))
+CONTENT_QR_CODE_BYTES=$((${MAX_QR_SIZE}-SIZE_DATAQR_METADATA))
+
+show_debug_variable "SIZE_DATAQR_METADATA"
 show_debug_variable "CONTENT_QR_CODE_BYTES"
 
 # TODO: some print of the content per qr code
@@ -464,7 +477,6 @@ full_encode(){
     echo_verbose "start qr-code archiving..."
 
     # generate a random signature ID for the package
-    SIZE_ID=8
     ID=$(dd if=/dev/urandom bs=${SIZE_ID} count=1 status=none)
     echo_verbose "random ID:"
 
@@ -608,6 +620,9 @@ full_encode(){
 # decoding                                   #
 ##############################################
 
+# TODO: split logics to make it easier to decode from a
+# messy set of QR-codes
+
 # for now takes a folder as argument and decode stuff there
 # assert that the folder contains all the qr-codes with names
 # in the format:
@@ -676,16 +691,35 @@ full_decode(){
     # TODO: have a digest of the whole file
     for CRRT_DATA in ${FOLDER_NAME}/data-??
     do
+	# the data part
         cat ${CRRT_DATA} >> ${ASSEMBLED_COMPRESSED}
         # remove the last bytes that are metadata
         # TODO: put this in logics
-        truncate -s -30 ${ASSEMBLED_COMPRESSED}
+        truncate -s -${SIZE_DATAQR_METADATA} ${ASSEMBLED_COMPRESSED}
+
+	# the metadata part
+	# TODO FIXME: some warnings here because of null bytes
+	# possible solution: use rev and truncate
+	CRRT_METADATA=$(tail -c -${SIZE_DATAQR_METADATA} ${CRRT_DATA})
+	show_debug_variable "CRRT_METADATA"
+	echo -n ${CRRT_METADATA} | xxd
+
+	# TODO: make all of this with arithmetics
+	CRRT_DIGEST=$(echo -n ${CRRT_METADATA} | head -c 20)
+	echo -n ${CRRT_DIGEST} | xxd
+	CRRT_ID=$(echo -n ${CRRT_METADATA} | head -c 28 | tail -c -8)
+	echo -n ${CRRT_ID} | xxd
+	CRRT_RANK=$(echo -n ${CRRT_METADATA} | head -c 30 | tail -c -2)
+	echo -n ${CRRT_RANK} | xxd
+
+	# TODO: make robust checks
+	# check the metadata
     done
     
     gunzip ${ASSEMBLED_COMPRESSED}
     mv ${ASSEMBLED_UNCOMPRESSED} ${OUTPUT_FILE}
 
-    echo "success with gunzip"
+    echo_verbose "success with gunzip"
 
 
 
