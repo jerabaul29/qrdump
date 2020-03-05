@@ -160,7 +160,7 @@ show_debug_variable(){
 ##############################################
 
 # check valid filename if encode
-if [ "${ACTION}" = "Encode" ]
+if [[ "${ACTION}" = "Encode" ]]
 then
     FILE_NAME=$1
     echo_verbose "qr-code archiving of ${FILE_NAME}"
@@ -172,7 +172,7 @@ then
 fi
 
 # check valid folder if decode
-if [ "${ACTION}" = "Decode" ]
+if [[ "${ACTION}" = "Decode" ]]
 then
     FOLDER_NAME=$1
     echo_verbose "qr-code decoding of ${FOLDER_NAME}"
@@ -184,7 +184,7 @@ then
 fi
 
 # check using base64 for now
-if [ "${ENCODING}" != "base64" ]
+if [[ "${ENCODING}" != "base64" ]]
 then
     echo "at the moment, only base64 encoding is supported!"
     echo "see: https://stackoverflow.com/questions/60506222"
@@ -282,7 +282,7 @@ digest_function(){
     if [[ "$#" = "1" ]]
     then
         # this needs to be a file that exists
-        if [ ! -f $1 ]
+        if [[ ! -f $1 ]]
         then
             echo "File not found! Aborting..."
             exit 6
@@ -334,10 +334,38 @@ perform_qr_encoding(){
     local DESTINATION=$2
 
     # allow base64
-    if [ "${ENCODING}" = "base64"  ]
+    if [[ "${ENCODING}" = "base64"  ]]
     then
         base64 < ${TO_ENCODE} | qrencode -l H -8 -o ${DESTINATION}.png
     fi
+}
+
+# unfortunately, seems that need to do this from the body of the other 
+# function otherwise the new variables are masked
+read_metadata(){
+    # NOTE: here using some global variables dark magics... dangerous!
+    local PATH=$1
+    local IFS=":"
+    # TODO: fix uppper case convention in this function
+    while read -r name value
+    do
+        echo $name
+        # special treatment when debug display in case of binary data
+        if [[ "${name}" = "ID" ]]
+        then
+            if [[ "${VERBOSE}" = "True" ]]
+            then
+                echo "FIXME HERE"
+                # TODO: strange xxd command not found bug here
+            #    echo -n ${value} | xxd
+            fi
+        else
+            echo_verbose "Content of metadata field ${name} is ${value}"
+        fi
+        declare "${name}"="${value}"
+    done < ${PATH}
+
+    echo ${QRD}
 }
 
 perform_qr_decoding(){
@@ -347,7 +375,7 @@ perform_qr_decoding(){
     echo_verbose "decoding ${TO_DECODE} into ${DESTINATION}"
 
     # allow base64
-    if [ "${ENCODING}" = "base64"  ]
+    if [[ "${ENCODING}" = "base64"  ]]
     then
         echo_verbose "using encoding base64"
         zbarimg --raw --quiet "${TO_DECODE}" | base64 -d > "${DESTINATION}"
@@ -439,7 +467,11 @@ full_encode(){
     SIZE_ID=8
     ID=$(dd if=/dev/urandom bs=${SIZE_ID} count=1 status=none)
     echo_verbose "random ID:"
-    echo_verbose -n ${ID} | xxd
+
+    if [[ "${VERBOSE}" = "True" ]]
+    then
+        echo -n ${ID} | xxd
+    fi
 
     # TODO: have a 'main functions section'
 
@@ -450,15 +482,15 @@ full_encode(){
     # compress the destination file
     # display information, use maximum compression
     echo_verbose "compressing file..."
-    gzip -vc9 ${FILE_NAME} > ${TMP_DIR}/compressed
+    gzip -vc9 ${FILE_NAME} > ${TMP_DIR}/compressed.gz
 
     echo_verbose "information about compressed binary file:"
-    ls -lrth ${TMP_DIR}/compressed
+    ls -lrth ${TMP_DIR}/compressed.gz
 
     # split the compressed file
     # into segments to be used for qr-codes.
     echo_verbose "split the compressed file into segments"
-    split -d -a 2 -b ${CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed ${TMP_DIR}/data-
+    split -d -a 2 -b ${CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
 
     NBR_DATA_SEGMENTS=$(find ${TMP_DIR} -name 'data-*' | wc -l)
     echo_verbose "split into ${NBR_DATA_SEGMENTS} segments"
@@ -518,7 +550,7 @@ full_encode(){
 
     # check that metadata is not too heavy
     # use the same size as the max qrcode choosen previously
-    if [ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${MAX_QR_SIZE} ]; then
+    if [[ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${MAX_QR_SIZE} ]]; then
         echo_verbose "*** WARNING *** looks like the metadata is dangerously big!"
     fi
 
@@ -604,8 +636,58 @@ full_decode(){
 
     done
 
-    # move to the right final file name
+    # read the metadata
+    # TODO: move to a function
+    # NOTE: had tried but encountered problems, probably something stupid
+    local METADATA_PATH=${FOLDER_NAME}/metadata
+    local IFS=":"
+    # TODO: fix uppper case convention in this loop
+    while read -r name value
+    do
+        echo $name
+        # special treatment when debug display in case of binary data
+        if [[ "${name}" = "ID" ]]
+        then
+            if [[ "${VERBOSE}" = "True" ]]
+            then
+                echo -n ${value} | xxd
+            fi
+        else
+            echo_verbose "Content of metadata field ${name} is ${value}"
+        fi
+        declare "${name}"="${value}"
+    done < ${METADATA_PATH}
+
+    # TODO: fix this messy thing under with file names and paths
+    # assemble the final data file
+    #local OUTPUT_NAME="${QRD}"
+    local OUTPUT_FILE="${FOLDER_NAME}/${QRD}"
+    local ASSEMBLED_COMPRESSED="${FOLDER_NAME}/compressed.gz"
+    local ASSEMBLED_UNCOMPRESSED="${FOLDER_NAME}/compressed"
+
+    show_debug_variable "OUTPUT_FILE"
+    show_debug_variable "ASSEMBLED_COMPRESSED"
+
+    #echo_verbose "using output file ${OUTPUT_FILE}"
+    #touch ${OUTPUT_FILE}
+    touch ${ASSEMBLED_COMPRESSED}
+
+    # TODO: use the metadata to check consistency, digests, etc
+    # TODO: have a digest of the whole file
+    for CRRT_DATA in ${FOLDER_NAME}/data-??
+    do
+        cat ${CRRT_DATA} >> ${ASSEMBLED_COMPRESSED}
+        # remove the last bytes that are metadata
+        # TODO: put this in logics
+        truncate -s -30 ${ASSEMBLED_COMPRESSED}
+    done
     
+    gunzip ${ASSEMBLED_COMPRESSED}
+    mv ${ASSEMBLED_UNCOMPRESSED} ${OUTPUT_FILE}
+
+    echo "success with gunzip"
+
+
 
 }
 
@@ -620,17 +702,16 @@ full_decode(){
 # actually do the work                       #
 ##############################################
 
-if [ "${ACTION}" = "Encode" ]
+if [[ "${ACTION}" = "Encode" ]]
 then
     echo_verbose "doing an encoding"
     full_encode
 fi
 
 
-if [ "${ACTION}" = "Decode" ]
+if [[ "${ACTION}" = "Decode" ]]
 then
     echo_verbose "doing a decoding"
     full_decode
 fi
-
 

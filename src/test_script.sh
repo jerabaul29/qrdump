@@ -33,6 +33,10 @@ press_any(){
     echo " "
 }
 
+give_access(){
+    nautilus . &
+}
+
 ########################################
 # test of encoding / decoding base64   #
 ########################################
@@ -46,14 +50,28 @@ fi
 mkdir dummy
 cd dummy
 
+give_access
+
 head -c 4096 </dev/urandom > dummy_file.dat
 
 # TODO: take sha of it
+DIGEST_IN=$(sha512sum dummy_file.dat | awk '{print $1;}' | xxd -r -ps)
+echo "digest of the random file:"
+echo ${DIGEST_IN}
 
 bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
-cd ..
 
 echo "encoding finished"
+# TODO: maybe cleaning should be done another place or something like that
+echo "clean the initial file"
+mv dummy_file.dat dummy_file_start.dat
+
+# need to sleep a bit to make sure all files well written
+sleep 5
+
+
+cd ..
+
 press_any
 
 # TODO: clean
@@ -62,6 +80,17 @@ bash ./qrdump.sh --base64 -b -d -v dummy
 
 echo "decoding finished"
 press_any
+DIGEST_OUT=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}' | xxd -r -ps)
+echo "digest of the decrypted file:"
+echo ${DIGEST_OUT}
+
+if [[ "${DIGEST_IN}" = "${DIGEST_OUT}" ]]
+then
+    echo "success restoring!"
+else
+    echo "non identical file!"
+    exit 1
+fi
 
 # TODO: take sha of decoded and check integrity
 
