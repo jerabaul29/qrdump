@@ -324,6 +324,8 @@ digest_function(){
     echo -n "${DIGEST}" | awk '{print $1;}' | xxd -r -ps
 }
 
+# TODO: consider factoring verbosity in the functions
+
 perform_qr_encoding(){
     # arg 1: data file to encode into a QR-code
     # arg 2: destination where to put the QR-code
@@ -342,9 +344,12 @@ perform_qr_decoding(){
     local TO_DECODE=$1
     local DESTINATION=$2
 
+    echo_verbose "decoding ${TO_DECODE} into ${DESTINATION}"
+
     # allow base64
     if [ "${ENCODING}" = "base64"  ]
     then
+        echo_verbose "using encoding base64"
         zbarimg --raw --quiet "${TO_DECODE}" | base64 -d > "${DESTINATION}"
     fi
 }
@@ -484,6 +489,8 @@ full_encode(){
         perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
     done
 
+    # TODO: separate function to generate the metadata
+    # (and separate function to decode the metadata)
     # generate the qr code with the metadata
     echo_verbose "create meteadata"
 
@@ -575,6 +582,9 @@ full_encode(){
 # metadata.png
 # data-XX.png
 full_decode(){
+    # NOTE: this works now because the original files were in the tmp dict at encoding...
+    # TODO: do all intermediate operations in a tmp
+
     # decode metadata
     local TO_DECODE="${FOLDER_NAME}/metadata.png"
     local DESTINATION="${FOLDER_NAME}/metadata"
@@ -582,10 +592,20 @@ full_decode(){
     # TODO: check that filename exists
 
     perform_qr_decoding ${TO_DECODE} ${DESTINATION}
+    # TODO: extract information from the metadata to help the following
 
     # decode all segments
+    for CRRT_QR_CODE in ${FOLDER_NAME}/data-??.png
+    do
+        local CRRT_DESTINATION="${CRRT_QR_CODE%.*}"
+        echo_verbose $CRRT_QR_CODE
+        echo_verbose $CRRT_DESTINATION
+        perform_qr_decoding "${CRRT_QR_CODE}" "${CRRT_DESTINATION}"
+
+    done
 
     # move to the right final file name
+    
 
 }
 
@@ -607,5 +627,10 @@ then
 fi
 
 
+if [ "${ACTION}" = "Decode" ]
+then
+    echo_verbose "doing a decoding"
+    full_decode
+fi
 
 

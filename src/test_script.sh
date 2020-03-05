@@ -4,6 +4,7 @@
 # TODO: move to its own folder
 # TODO: automate testing
 # TODO: increase coverage
+# TODO: use fully extended options for lisibility
 
 ##############################################
 # sounder programming environment            #
@@ -21,6 +22,10 @@ set -o nounset
 ########################################
 # helper functions                     #
 ########################################
+
+# TODO: have a 'manual run' and an 'automatic run'
+# option for running this. In manual automatic run
+# make press_any do nothing and redirect to a log file
 
 press_any(){
     echo "giving a chance to inspect the output"
@@ -43,8 +48,21 @@ cd dummy
 
 head -c 4096 </dev/urandom > dummy_file.dat
 
-bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
+# TODO: take sha of it
 
-press_any
+bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
 cd ..
+
+echo "encoding finished"
+press_any
+
+# TODO: clean
+# TODO: decode
+bash ./qrdump.sh --base64 -b -d -v dummy
+
+echo "decoding finished"
+press_any
+
+# TODO: take sha of decoded and check integrity
+
 rm -rf dummy
