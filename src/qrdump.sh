@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: metadata: put zbarimg
+
 # TODO: make it work in base64 encoding: dumping + extraction of metadata + 1 qr code
 # then metadata + several QR codes
 
@@ -298,6 +300,17 @@ perform_qr_encoding(){
     if [ "${ENCODING}" = "base64"  ]
     then
         base64 < ${TO_ENCODE} | qrencode -l H -8 -o ${DESTINATION}.png
+    fi
+}
+
+perform_qr_decoding(){
+    local TO_DECODE=$1
+    local DESTINATION=$2
+
+    # allow base64
+    if [ "${ENCODING}" = "base64"  ]
+    then
+        zbarimg --raw --quiet "${TO_DECODE}" | base64 -d > "${DESTINATION}"
     fi
 }
 
