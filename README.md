@@ -2,7 +2,7 @@
 
 **qrdump**: a tool for dumping data into a series of qr-codes for long-time archiving.
 
-:warning: :construction: **this is a very recent repo very much under construction; consider waiting a bit before starting to use the code here; contributions / feedback / code reviews welcome though :construction: :warning:
+:warning: :construction: **this is a very recent repo very much under construction; consider waiting a bit before starting to use the code here; contributions / feedback / code reviews welcome though** :construction: :warning:
 
 The platformed aimed for is linux. The code is a set of bash scripts leveraging standard linux packages.
 
