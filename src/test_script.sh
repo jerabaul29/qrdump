@@ -32,10 +32,18 @@ press_any(){
 # test of encoding / decoding base64   #
 ########################################
 
+if [ -d "dummy" ]
+then
+    echo "dir dummy for tests already exists; cleaning!"
+    rm -rf dummy
+fi
+
 mkdir dummy
 cd dummy
 
 head -c 4096 </dev/urandom > dummy_file.dat
+
+bash ../qrdump.sh --base64 -d -v dummy_file.dat
 
 press_any
 cd ..

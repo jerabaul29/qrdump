@@ -8,6 +8,8 @@
 
 # TODO: automatic tests for development
 
+# TODO: let the user specify the output / output folder etc
+
 # TODO: move into an own repo, and make it into 'qrdump'
 # TODO: use 1 script to do all, both dump and extract?
 
@@ -123,19 +125,6 @@ fi
 # TODO: harmonize exit codes
 
 ##############################################
-# input sanitation                           #
-##############################################
-
-FILE_NAME=$1
-echo_verbose "qr-code archiving of ${FILE_NAME}"
-
-if [ ! -f ${FILE_NAME} ]; then
-    echo "File not found! Aborting..."
-    exit 5
-fi
-
-
-##############################################
 # critical verbose and debug functions       #
 ##############################################
 
@@ -153,6 +142,27 @@ show_debug_variable(){
     fi
 }
 
+
+
+##############################################
+# input sanitation                           #
+##############################################
+
+FILE_NAME=$1
+echo_verbose "qr-code archiving of ${FILE_NAME}"
+
+if [ ! -f ${FILE_NAME} ]; then
+    echo "File not found! Aborting..."
+    exit 5
+fi
+
+if [ "${ENCODING}" != "base64" ]
+then
+    echo "at the moment, only base64 encoding is supported!"
+    echo "see: https://stackoverflow.com/questions/60506222"
+    echo "Aborting..."
+    exit 1
+fi
 
 ##############################################
 # in case of debug, show the options         #
@@ -205,7 +215,7 @@ echo_verbose "start qr-code archiving..."
 # parameters dependent functions             #
 ##############################################
 
-# TODO: give several possible including none
+# TODO: give several digests possible including none
 # the digest function to use
 # this is not for cryptographic reasons,
 # only as a strong proof that the data
@@ -275,6 +285,20 @@ digest_function(){
     fi
 
     echo -n "${DIGEST}" | awk '{print $1;}' | xxd -r -ps
+}
+
+perform_qr_encoding(){
+    # arg 1: data file to encode into a QR-code
+    # arg 2: destination where to put the QR-code
+
+    local TO_ENCODE=$1
+    local DESTINATION=$2
+
+    # allow base64
+    if [ "${ENCODING}" = "base64"  ]
+    then
+        base64 < ${TO_ENCODE} | qrencode -l H -8 -o ${DESTINATION}.png
+    fi
 }
 
 SIZE_DIGEST=$(echo -n "anything" | digest_function | wc -c)
@@ -353,6 +377,11 @@ echo_verbose -n ${ID} | xxd
 # ready to do the heavy work                 #
 ##############################################
 
+
+##############################################
+# encoding in series of QR codes             #
+##############################################
+
 # TODO: have a 'main functions section'
 
 # create temporary folder
@@ -398,7 +427,7 @@ for CRRT_FILE in ${TMP_DIR}/data-??; do
 
     # use highest error correction level
     # TODO: adjust parameters to get nice sharp qr codes to print on A4
-    cat ${CRRT_FILE} | qrencode -l H -8 -o ${CRRT_FILE}.png
+    perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
 done
 
 # generate the qr code with the metadata
@@ -433,7 +462,7 @@ if [ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${MAX_QR_SIZE} ]; then
 fi
 
 echo_verbose "generate metadata qr code"
-cat ${CRRT_FILE} | qrencode -l H -8 -o ${CRRT_FILE}.png
+perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
 
 # check that able to decode all and agree with the input data
 # TODO: for all in png decrypt and compare with the non png
@@ -453,6 +482,11 @@ cat ${CRRT_FILE} | qrencode -l H -8 -o ${CRRT_FILE}.png
 
 # move all the qr codes to a new folder
 # at the current location
+for CRRT_QR_CODE in ${TMP_DIR}/*\.png; do
+    CRRT_DESTINATION="$(basename ${CRRT_QR_CODE})"
+    echo_verbose "move ${CRRT_QR_CODE} to ${CRRT_DESTINATION}"
+    cp ${CRRT_QR_CODE} ${CRRT_DESTINATION}
+done
 
 # delete temporary folder
 if [[ "${DEBUG}" = "True" ]];
@@ -476,6 +510,9 @@ echo_verbose "done"
 
 
 
+##############################################
+# decoding                                   #
+##############################################
 
 
 
