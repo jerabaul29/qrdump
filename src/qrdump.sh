@@ -49,8 +49,8 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
 fi
 
 # acceptable options
-OPTIONS=hvdg
-LONGOPTS=help,verbose,base64,debug,digest:,
+OPTIONS=hvbged
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode
 
 # TODO: add the --dump - d and the --extract -e options
 # TODO: to allow the previous, change --debug -d to -b --debug
@@ -61,6 +61,7 @@ VERBOSE="False"
 ENCODING="binary"  # TODO: add to options; use base64 so long
 DEBUG="False"
 DIGEST="sha1sum"
+ACTION="None"
 
 # -regarding ! and PIPESTATUS see above
 # -temporarily store output to be able to check for errors
@@ -91,13 +92,21 @@ while true; do
             ENCODING="base64"
             shift
             ;;
-        -d|--debug)
+        -b|--debug)
             DEBUG="True"
             shift
             ;;
         -g|--digest)
             DIGEST="$2"
             shift 2
+            ;;
+        -e|--encode)
+            ACTION="Encode"
+            shift
+            ;;
+        -d|--decode)
+            ACTION="Decode"
+            shift
             ;;
         --)
             shift
@@ -150,19 +159,46 @@ show_debug_variable(){
 # input sanitation                           #
 ##############################################
 
-FILE_NAME=$1
-echo_verbose "qr-code archiving of ${FILE_NAME}"
+# check valid filename if encode
+if [ "${ACTION}" = "Encode" ]
+then
+    FILE_NAME=$1
+    echo_verbose "qr-code archiving of ${FILE_NAME}"
 
-if [ ! -f ${FILE_NAME} ]; then
-    echo "File not found! Aborting..."
-    exit 5
+    if [ ! -f ${FILE_NAME} ]; then
+        echo "File not found! Aborting..."
+        exit 5
+    fi
 fi
 
+# check valid folder if decode
+if [ "${ACTION}" = "Decode" ]
+then
+    FOLDER_NAME=$1
+    echo_verbose "qr-code decoding of ${FOLDER_NAME}"
+
+    if [ ! -d ${FOLDER_NAME} ]; then
+        echo "Folder not found! Aborting..."
+        exit 5
+    fi
+fi
+
+# check using base64 for now
 if [ "${ENCODING}" != "base64" ]
 then
     echo "at the moment, only base64 encoding is supported!"
     echo "see: https://stackoverflow.com/questions/60506222"
     echo "Aborting..."
+    exit 1
+fi
+
+# check using valid action
+if [[ "${ACTION}" =~ ^(cat|Encode|Decode)$ ]]; then
+    echo_verbose "valid action"
+else
+    echo "invalid action: ACTION is now ${ACTION}."
+    echo "needs either -d|--decode or -e|--encode flag"
+    echo "abortin..."
     exit 1
 fi
 
@@ -175,7 +211,7 @@ show_debug_variable "VERBOSE"
 show_debug_variable "ENCODING"
 show_debug_variable "DEBUG"
 show_debug_variable "DIGEST"
-
+show_debug_variable "ACTION"
 
 # TODO: add description / manpage (see what is below)
 
@@ -210,7 +246,6 @@ show_debug_variable "DIGEST"
 # gzip
 # 
 
-echo_verbose "start qr-code archiving..."
 
 ##############################################
 # parameters processing and                  #
@@ -347,11 +382,6 @@ show_debug_variable "CONTENT_QR_CODE_BYTES"
 # help in splitting / putting together
 # no encryption or malicious user
 
-# generate a random signature ID for the package
-SIZE_ID=8
-ID=$(dd if=/dev/urandom bs=${SIZE_ID} count=1 status=none)
-echo_verbose "random ID:"
-echo_verbose -n ${ID} | xxd
 
 # TODO: function to organize the scanned QR codes
 # for printing
@@ -395,123 +425,135 @@ echo_verbose -n ${ID} | xxd
 # encoding in series of QR codes             #
 ##############################################
 
-# TODO: have a 'main functions section'
+# TODO: split the logics in smaller functions
 
-# create temporary folder
-TMP_DIR=$(mktemp -d)
-echo_verbose "created working tmp: ${TMP_DIR}"
+full_encode(){
+    echo_verbose "start qr-code archiving..."
 
-# compress the destination file
-# display information, use maximum compression
-echo_verbose "compressing file..."
-gzip -vc9 ${FILE_NAME} > ${TMP_DIR}/compressed
+    # generate a random signature ID for the package
+    SIZE_ID=8
+    ID=$(dd if=/dev/urandom bs=${SIZE_ID} count=1 status=none)
+    echo_verbose "random ID:"
+    echo_verbose -n ${ID} | xxd
 
-echo_verbose "information about compressed binary file:"
-ls -lrth ${TMP_DIR}/compressed
+    # TODO: have a 'main functions section'
 
-# split the compressed file
-# into segments to be used for qr-codes.
-echo_verbose "split the compressed file into segments"
-split -d -a 2 -b ${CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed ${TMP_DIR}/data-
+    # create temporary folder
+    TMP_DIR=$(mktemp -d)
+    echo_verbose "created working tmp: ${TMP_DIR}"
 
-NBR_DATA_SEGMENTS=$(find ${TMP_DIR} -name 'data-*' | wc -l)
-echo_verbose "split into ${NBR_DATA_SEGMENTS} segments"
+    # compress the destination file
+    # display information, use maximum compression
+    echo_verbose "compressing file..."
+    gzip -vc9 ${FILE_NAME} > ${TMP_DIR}/compressed
 
-# append for each data segment its digest
-# the ID, and current segment number
-COUNTER=0
+    echo_verbose "information about compressed binary file:"
+    ls -lrth ${TMP_DIR}/compressed
 
-for CRRT_FILE in ${TMP_DIR}/data-??; do
-    echo_verbose "append digest ID to ${CRRT_FILE}"
+    # split the compressed file
+    # into segments to be used for qr-codes.
+    echo_verbose "split the compressed file into segments"
+    split -d -a 2 -b ${CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed ${TMP_DIR}/data-
 
-    digest_function ${CRRT_FILE} >> ${CRRT_FILE}
+    NBR_DATA_SEGMENTS=$(find ${TMP_DIR} -name 'data-*' | wc -l)
+    echo_verbose "split into ${NBR_DATA_SEGMENTS} segments"
 
-    echo -n "${ID}" >> ${CRRT_FILE}
+    # append for each data segment its digest
+    # the ID, and current segment number
+    COUNTER=0
 
-    # NOTE: this limits the max number of segments to 2^16-1 as
-    # we are using 2 bytes for encoding
-    printf "0: %.4x" $COUNTER | xxd -r -g0 >> ${CRRT_FILE}
-    COUNTER=$((COUNTER+1))
-done
+    for CRRT_FILE in ${TMP_DIR}/data-??; do
+        echo_verbose "append digest ID to ${CRRT_FILE}"
 
-# generate the data segments qr codes
-for CRRT_FILE in ${TMP_DIR}/data-??; do
-    echo_verbose "generate the qr-code for ${CRRT_FILE}"
+        digest_function ${CRRT_FILE} >> ${CRRT_FILE}
 
-    # use highest error correction level
-    # TODO: adjust parameters to get nice sharp qr codes to print on A4
+        echo -n "${ID}" >> ${CRRT_FILE}
+
+        # NOTE: this limits the max number of segments to 2^16-1 as
+        # we are using 2 bytes for encoding
+        printf "0: %.4x" $COUNTER | xxd -r -g0 >> ${CRRT_FILE}
+        COUNTER=$((COUNTER+1))
+    done
+
+    # generate the data segments qr codes
+    for CRRT_FILE in ${TMP_DIR}/data-??; do
+        echo_verbose "generate the qr-code for ${CRRT_FILE}"
+
+        # use highest error correction level
+        # TODO: adjust parameters to get nice sharp qr codes to print on A4
+        perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
+    done
+
+    # generate the qr code with the metadata
+    echo_verbose "create meteadata"
+
+    CRRT_FILE=${TMP_DIR}/metadata
+    echo -n "QRD:" >> ${CRRT_FILE}
+    echo "$(basename ${FILE_NAME})" >> ${CRRT_FILE}
+
+    echo -n "NSEG:" >> ${CRRT_FILE}
+    echo "${NBR_DATA_SEGMENTS}" >> ${CRRT_FILE}
+
+    echo -n "DATE:" >> ${CRRT_FILE}
+    echo "$(date '+%Y-%m-%d,%H:%M:%S')" >> ${CRRT_FILE}
+
+    echo -n "ID:" >> ${CRRT_FILE}
+    echo "${ID}" >> ${CRRT_FILE}
+
+    echo -n "vGZIP:" >> ${CRRT_FILE}
+    echo "$(gzip --version | head -1 | awk '{print $2}')" >> ${CRRT_FILE}
+
+    echo -n "vQRENCODE:" >> ${CRRT_FILE}
+    echo "$(qrencode --version 2>&1 | head -1 |  awk '{print $3}')" >> ${CRRT_FILE}
+
+    echo -n "SYS:" >> ${CRRT_FILE}
+    echo "$(lsb_release -d | cut -f 2- -d$'\t' | sed 's/ //g')" >> ${CRRT_FILE}
+
+    # check that metadata is not too heavy
+    # use the same size as the max qrcode choosen previously
+    if [ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${MAX_QR_SIZE} ]; then
+        echo_verbose "*** WARNING *** looks like the metadata is dangerously big!"
+    fi
+
+    echo_verbose "generate metadata qr code"
     perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
-done
 
-# generate the qr code with the metadata
-echo_verbose "create meteadata"
+    # check that able to decode all and agree with the input data
+    # TODO: for all in png decrypt and compare with the non png
 
-CRRT_FILE=${TMP_DIR}/metadata
-echo -n "QRD:" >> ${CRRT_FILE}
-echo "$(basename ${FILE_NAME})" >> ${CRRT_FILE}
+    # TODO: put on an A4 page
 
-echo -n "NSEG:" >> ${CRRT_FILE}
-echo "${NBR_DATA_SEGMENTS}" >> ${CRRT_FILE}
-
-echo -n "DATE:" >> ${CRRT_FILE}
-echo "$(date '+%Y-%m-%d,%H:%M:%S')" >> ${CRRT_FILE}
-
-echo -n "ID:" >> ${CRRT_FILE}
-echo "${ID}" >> ${CRRT_FILE}
-
-echo -n "vGZIP:" >> ${CRRT_FILE}
-echo "$(gzip --version | head -1 | awk '{print $2}')" >> ${CRRT_FILE}
-
-echo -n "vQRENCODE:" >> ${CRRT_FILE}
-echo "$(qrencode --version 2>&1 | head -1 |  awk '{print $3}')" >> ${CRRT_FILE}
-
-echo -n "SYS:" >> ${CRRT_FILE}
-echo "$(lsb_release -d | cut -f 2- -d$'\t' | sed 's/ //g')" >> ${CRRT_FILE}
-
-# check that metadata is not too heavy
-# use the same size as the max qrcode choosen previously
-if [ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${MAX_QR_SIZE} ]; then
-    echo_verbose "*** WARNING *** looks like the metadata is dangerously big!"
-fi
-
-echo_verbose "generate metadata qr code"
-perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
-
-# check that able to decode all and agree with the input data
-# TODO: for all in png decrypt and compare with the non png
-
-# TODO: put on an A4 page
-
-# TODO: the encoding / decoding with QR codes is broken for now because
-# probably of what zbarimg does when the qr code contains some binary
-# data, see:
-# https://stackoverflow.com/questions/60506222/encode-decode-binary-data-in-a-qr-code-using-qrencode-and-zbarimg-in-bash
-# trying to get a version of zbarimg that does not break the binary
-# encoding thing. Another option as suggested on SO is to use
-# a base64 encoding, but I am afraid that it will reduce the
-# capacity by a factor of 2.
-# a fix to zbarimg is under its way and should solve the problem.
+    # TODO: the encoding / decoding with QR codes is broken for now because
+    # probably of what zbarimg does when the qr code contains some binary
+    # data, see:
+    # https://stackoverflow.com/questions/60506222/encode-decode-binary-data-in-a-qr-code-using-qrencode-and-zbarimg-in-bash
+    # trying to get a version of zbarimg that does not break the binary
+    # encoding thing. Another option as suggested on SO is to use
+    # a base64 encoding, but I am afraid that it will reduce the
+    # capacity by a factor of 2.
+    # a fix to zbarimg is under its way and should solve the problem.
 
 
-# move all the qr codes to a new folder
-# at the current location
-for CRRT_QR_CODE in ${TMP_DIR}/*\.png; do
-    CRRT_DESTINATION="$(basename ${CRRT_QR_CODE})"
-    echo_verbose "move ${CRRT_QR_CODE} to ${CRRT_DESTINATION}"
-    cp ${CRRT_QR_CODE} ${CRRT_DESTINATION}
-done
+    # move all the qr codes to a new folder
+    # at the current location
+    for CRRT_QR_CODE in ${TMP_DIR}/*\.png; do
+        CRRT_DESTINATION="$(basename ${CRRT_QR_CODE})"
+        echo_verbose "move ${CRRT_QR_CODE} to ${CRRT_DESTINATION}"
+        cp ${CRRT_QR_CODE} ${CRRT_DESTINATION}
+    done
 
-# delete temporary folder
-if [[ "${DEBUG}" = "True" ]];
-then
-    echo "in debug mode, the tmp dir is not removed to allow inspection"
-    echo "tmp is found in: ${TMP_DIR}"
-else
-    echo_verbose "removed working tmp: ${TMP_DIR}"
-    rm -r $TMP_DIR
-fi
+    # delete temporary folder
+    if [[ "${DEBUG}" = "True" ]];
+    then
+        echo "in debug mode, the tmp dir is not removed to allow inspection"
+        echo "tmp is found in: ${TMP_DIR}"
+    else
+        echo_verbose "removed working tmp: ${TMP_DIR}"
+        rm -r $TMP_DIR
+    fi
 
-echo_verbose "done"
+    echo_verbose "done"
+}
 
 
 
@@ -527,12 +569,42 @@ echo_verbose "done"
 # decoding                                   #
 ##############################################
 
+# for now takes a folder as argument and decode stuff there
+# assert that the folder contains all the qr-codes with names
+# in the format:
+# metadata.png
+# data-XX.png
+full_decode(){
+    # decode metadata
+    local TO_DECODE="${FOLDER_NAME}/metadata.png"
+    local DESTINATION="${FOLDER_NAME}/metadata"
+
+    # TODO: check that filename exists
+
+    perform_qr_decoding ${TO_DECODE} ${DESTINATION}
+
+    # decode all segments
+
+    # move to the right final file name
+
+}
 
 
 
 
 
 
+
+
+##############################################
+# actually do the work                       #
+##############################################
+
+if [ "${ACTION}" = "Encode" ]
+then
+    echo_verbose "doing an encoding"
+    full_encode
+fi
 
 
 

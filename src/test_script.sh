@@ -43,7 +43,7 @@ cd dummy
 
 head -c 4096 </dev/urandom > dummy_file.dat
 
-bash ../qrdump.sh --base64 -d -v dummy_file.dat
+bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
 
 press_any
 cd ..
