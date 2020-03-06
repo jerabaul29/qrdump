@@ -254,6 +254,17 @@ show_debug_variable "ACTION"
 # parameters dependent functions             #
 ##############################################
 
+n_last_bytes(){
+    # write the last $1 bytes of file $2 to $3
+    local FILESIZE=$(stat -c%s "$2")
+    show_debug_variable "FILESIZE"
+
+    local NBYTES_TO_CUT=$((${FILESIZE}-$1))
+    show_debug_variable "NBYTES_TO_CUT"
+
+    dd if="$2" of="$3" ibs="${NBYTES_TO_CUT}" skip=1
+}
+
 # TODO: give several digests possible including none
 # the digest function to use
 # this is not for cryptographic reasons,
@@ -700,9 +711,9 @@ full_decode(){
 	# the metadata part
 	# TODO FIXME: some warnings here because of null bytes
 	# possible solution: use rev and truncate
-	CRRT_METADATA=$(tail -c -${SIZE_DATAQR_METADATA} ${CRRT_DATA})
-	show_debug_variable "CRRT_METADATA"
-	echo -n ${CRRT_METADATA} | xxd
+    local CRRT_METADATA="${CRRT_DATA}_meta"
+    n_last_bytes "${SIZE_DATAQR_METADATA}" "${CRRT_DATA}" "${CRRT_METADATA}"
+	cat ${CRRT_METADATA} | xxd
 
 	# TODO: make all of this with arithmetics
 	CRRT_DIGEST=$(echo -n ${CRRT_METADATA} | head -c 20)
