@@ -266,7 +266,7 @@ n_last_bytes(){
     local NBYTES_TO_CUT=$((${FILESIZE}-$1))
     show_debug_variable "NBYTES_TO_CUT"
 
-    dd if="$2" of="$3" ibs="${NBYTES_TO_CUT}" skip=1
+    dd if="$2" of="$3" ibs="${NBYTES_TO_CUT}" skip=1 status=none
 }
 
 # TODO: give several digests possible including none
@@ -721,17 +721,16 @@ full_decode(){
 
         # TODO: make all of this with arithmetics
         # TODO: build an external function to do this in 1 single pass
-        # dd if=input.binary of=output.binary skip=$offset count=$bytes iflag=skip_bytes,count_bytes 
         local CRRT_DIGEST="${CRRT_METADATA}_digest"
-        dd if="${CRRT_METADATA}" of="${CRRT_DIGEST}" skip=0 count=20 iflag=skip_bytes,count_bytes
+        dd if="${CRRT_METADATA}" of="${CRRT_DIGEST}" skip=0 count=20 iflag=skip_bytes,count_bytes status=none
         cat "${CRRT_DIGEST}" | xxd
 
         local CRRT_ID="${CRRT_METADATA}_ID"
-        dd if="${CRRT_METADATA}" of="${CRRT_ID}" skip=20 count=8 iflag=skip_bytes,count_bytes
+        dd if="${CRRT_METADATA}" of="${CRRT_ID}" skip=20 count=8 iflag=skip_bytes,count_bytes status=none
         cat "${CRRT_ID}" | xxd
 
         local CRRT_RANK="${CRRT_METADATA}_RANK"
-        dd if="${CRRT_METADATA}" of="${CRRT_RANK}" skip=28 count=2 iflag=skip_bytes,count_bytes
+        dd if="${CRRT_METADATA}" of="${CRRT_RANK}" skip=28 count=2 iflag=skip_bytes,count_bytes status=none
         cat "${CRRT_RANK}" | xxd
 
         # TODO: make robust checks
