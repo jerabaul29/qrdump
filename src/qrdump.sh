@@ -701,6 +701,12 @@ assemble_into_A4(){
 
     convert -size ${A4_TEXT_WIDTH}x${A4_TEXT_HEIGHT} xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_1st_page.txt ${FOLDER_NAME}/text_1st_page.png
 
+    convert ${FOLDER_NAME}/text_left_margin.png ${FOLDER_NAME}/text_1st_page.png ${FOLDER_NAME}/text_right_margin.png +append ${FOLDER_NAME}/text_image_chunk.png
+
+    # put the metadata qr code under
+
+    # on all pages: use a fixed layout corresponding to the max number of bytes ie max size of the qr codes
+
 
 
     
@@ -708,6 +714,7 @@ assemble_into_A4(){
 }
 
 
+# To get information about a png: use ''identify' command
 
 
 
