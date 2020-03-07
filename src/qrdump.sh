@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # TODO: make sure null bytes do not break stuff!
+# TODO: metadata QR: give them a signature: title line METADATAQRDUMP or similar
 
 # TODO: write a small bash function that cuts a file into a succession of segments
 # and write them to different files. This could be used for splitting more efficiently
@@ -55,8 +56,8 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
 fi
 
 # acceptable options
-OPTIONS=hvbged
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode
+OPTIONS=hvbgedl
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout
 
 # TODO: add the --dump - d and the --extract -e options
 # TODO: to allow the previous, change --debug -d to -b --debug
@@ -114,6 +115,10 @@ while true; do
             ACTION="Decode"
             shift
             ;;
+        -l|--layout)
+            ACTION="Layout"
+            shift
+            ;;
         --)
             shift
             break
@@ -135,7 +140,7 @@ fi
 
 # handle non-option arguments
 if [[ $# -ne 1 ]]; then
-    echo "$0: A single input file is required."
+    echo "$0: A single input file or folder is required."
     exit 4
 fi
 
@@ -159,6 +164,21 @@ show_debug_variable(){
     fi
 }
 
+show_debug_file_binary(){
+    local CRRT_VAR=$1
+
+    if [[ "${DEBUG}" = "True" ]]
+    then
+        # to avoid problems with null bytes, this MUST be read from file
+        if [[ -f "${!CRRT_VAR}" ]]
+        then
+            echo "${CRRT_VAR}:"
+            cat "${!CRRT_VAR}" | xxd
+        else
+            echo "*** WARNING *** no file available to read binary variable ${!CRRT_VAR}"
+        fi
+    fi
+}
 
 
 ##############################################
@@ -177,8 +197,8 @@ then
     fi
 fi
 
-# check valid folder if decode
-if [[ "${ACTION}" = "Decode" ]]
+# check valid folder if layout | decode
+if [[  "${ACTION}" =~ ^(cat|Decode|Layout)$ ]]
 then
     FOLDER_NAME=$1
     echo_verbose "qr-code decoding of ${FOLDER_NAME}"
@@ -199,7 +219,7 @@ then
 fi
 
 # check using valid action
-if [[ "${ACTION}" =~ ^(cat|Encode|Decode)$ ]]; then
+if [[ "${ACTION}" =~ ^(cat|Encode|Decode|Layout)$ ]]; then
     echo_verbose "valid action"
 else
     echo "invalid action: ACTION is now ${ACTION}."
@@ -353,7 +373,7 @@ perform_qr_encoding(){
     # allow base64
     if [[ "${ENCODING}" = "base64"  ]]
     then
-        base64 < ${TO_ENCODE} | qrencode -l H -8 -o ${DESTINATION}.png
+        base64 < ${TO_ENCODE} | qrencode -l M -8 -o ${DESTINATION}.png
     fi
 }
 
@@ -410,7 +430,7 @@ show_debug_variable "SIZE_DIGEST"
 # to be nice to possible bad printers
 # TODO: automatically get the digest function size
 # TODO: make this size an arg
-MAX_QR_SIZE=403
+MAX_QR_SIZE=331
 show_debug_variable "MAX_QR_SIZE"
 
 # the rank size in the data QR metadata
@@ -476,6 +496,17 @@ show_debug_variable "CONTENT_QR_CODE_BYTES"
 
 # TODO: debug mode where shows the tmp stuff
 # and do not remove it
+
+# TODO: allow dpi as arg
+# DPI 72 is qrencode default
+DPI=72
+
+# size of QR code dots in pixels
+# 3 is the default of qrencode following --size=NUMBER
+# TODO: make as an argument
+SIZE_QR_DOT=3
+
+
 
 ##############################################
 # ready to do the heavy work                 #
@@ -626,6 +657,55 @@ full_encode(){
 # TODO: have a 'main' section where most of the actual
 # work is done
 
+assemble_into_A4(){
+    # Equivalent A4 paper dimensions in pixels at 300 DPI and 72 DPI respectively are: 2480 pixels x 3508 pixels (print resolution) 595 pixels x 842 pixels (screen resolution)
+    # TODO: compute with logics, allow to adapt to dpi
+    # TODO: make all of that happen in a tmp
+    local A4_PIXELS_WIDTH=595
+    local A4_PIXELS_HEIGHT=842
+
+    local A4_LEFT_MARGIN=60
+    local A4_RIGHT_MARGIN=${A4_LEFT_MARGIN}
+
+    local A4_TOP_MARGIN=100
+    local A4_BOTTOM_MARGIN=${A4_TOP_MARGIN}
+
+    local A4_LINE_JUMP=100
+
+    # TODO: all of this should be written in logics rather than hard coded
+
+    # 1st page:
+    # tile and a few written information
+    # 1 QR code with layout information
+    # the metadata QR code
+
+    # layout information: left margin, inter-margin right-left, right margin,
+    # line jump margin, top margin, bottom margin
+
+    # 1st page ------------------------------
+    convert -size ${A4_PIXELS_WIDTH}x${A4_TOP_MARGIN} xc:white ${FOLDER_NAME}/top_margin.png
+    convert -size ${A4_PIXELS_WIDTH}x${A4_BOTTOM_MARGIN} xc:white ${FOLDER_NAME}/bottom_margin.png
+
+    # text
+    # 595 - 60 - 60
+    local A4_TEXT_WIDTH=475
+    local A4_TEXT_HEIGHT=250
+
+    convert -size ${A4_LEFT_MARGIN}x${A4_TEXT_HEIGHT} xc:white ${FOLDER_NAME}/text_left_margin.png
+    convert -size ${A4_RIGHT_MARGIN}x${A4_TEXT_HEIGHT} xc:white ${FOLDER_NAME}/text_right_margin.png
+
+    # TODO: put relevant metadata here in plaintex
+    echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_1st_page.txt
+    echo "some relevant metadata" >> ${FOLDER_NAME}/text_1st_page.txt
+    echo -n "\"" >> ${FOLDER_NAME}/text_1st_page.txt
+
+    convert -size ${A4_TEXT_WIDTH}x${A4_TEXT_HEIGHT} xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_1st_page.txt ${FOLDER_NAME}/text_1st_page.png
+
+
+
+    
+    sleep 1
+}
 
 
 
@@ -717,23 +797,27 @@ full_decode(){
         # possible solution: use rev and truncate
         local CRRT_METADATA="${CRRT_DATA}_meta"
         n_last_bytes "${SIZE_DATAQR_METADATA}" "${CRRT_DATA}" "${CRRT_METADATA}"
-        cat ${CRRT_METADATA} | xxd
 
         # TODO: make all of this with arithmetics
         # TODO: build an external function to do this in 1 single pass
-        local CRRT_DIGEST="${CRRT_METADATA}_digest"
-        dd if="${CRRT_METADATA}" of="${CRRT_DIGEST}" skip=0 count=20 iflag=skip_bytes,count_bytes status=none
-        cat "${CRRT_DIGEST}" | xxd
+        local FILE_CRRT_DIGEST="${CRRT_METADATA}_digest"
+        dd if="${CRRT_METADATA}" of="${FILE_CRRT_DIGEST}" skip=0 count=20 iflag=skip_bytes,count_bytes status=none
+        show_debug_file_binary "FILE_CRRT_DIGEST"
 
-        local CRRT_ID="${CRRT_METADATA}_ID"
-        dd if="${CRRT_METADATA}" of="${CRRT_ID}" skip=20 count=8 iflag=skip_bytes,count_bytes status=none
-        cat "${CRRT_ID}" | xxd
+        local FILE_CRRT_ID="${CRRT_METADATA}_ID"
+        dd if="${CRRT_METADATA}" of="${FILE_CRRT_ID}" skip=20 count=8 iflag=skip_bytes,count_bytes status=none
+        show_debug_file_binary "FILE_CRRT_ID"
 
-        local CRRT_RANK="${CRRT_METADATA}_RANK"
-        dd if="${CRRT_METADATA}" of="${CRRT_RANK}" skip=28 count=2 iflag=skip_bytes,count_bytes status=none
-        cat "${CRRT_RANK}" | xxd
+        local FILE_CRRT_RANK="${CRRT_METADATA}_RANK"
+        dd if="${CRRT_METADATA}" of="${FILE_CRRT_RANK}" skip=28 count=2 iflag=skip_bytes,count_bytes status=none
+        show_debug_file_binary "FILE_CRRT_RANK"
+
+
 
         # TODO: make robust checks
+        # check that order of the segments corresponds
+        # check that Id corresponds
+        # check that digest corresponds
         # check the metadata
     done
     
@@ -741,12 +825,19 @@ full_decode(){
     mv ${ASSEMBLED_UNCOMPRESSED} ${OUTPUT_FILE}
 
     echo_verbose "success with gunzip"
-
-
-
 }
 
 
+
+# TODO: function to layout on A4 page
+# - human readable title and info
+# - metadata qr
+# - data qr
+
+# TODO: function to extract list of QRs given a scan or series of scans
+# - find metatada QR
+# - decide how the QRs to extract should look like
+# - get the QRs from the A4 and make ready to use the extraction function
 
 
 
@@ -770,3 +861,8 @@ then
     full_decode
 fi
 
+if [[ "${ACTION}" = "Layout" ]]
+then
+    echo_verbose "doing a A4 layout of a dump"
+    assemble_into_A4
+fi
