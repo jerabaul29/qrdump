@@ -54,7 +54,7 @@ sleep 5
 
 cd ..
 
-bash ./qrdump.sh --layout --base64 dummy
+bash ./qrdump.sh --layout --base64 -b -v dummy
 
 press_any
 

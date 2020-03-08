@@ -289,6 +289,55 @@ n_last_bytes(){
     dd if="$2" of="$3" ibs="${NBYTES_TO_CUT}" skip=1 status=none
 }
 
+pad_png_image(){
+    # $1 path to the png
+    # $2 final X size
+    # $3 final Y size
+    # $4 path to generated png
+
+    local PNG_IN=$1
+    local FINAL_X_SIZE=$2
+    local FINAL_Y_SIZE=$3
+    local PNG_OUT=$4
+    local BASE_FOLDER=$(dirname "${PNG_IN}")
+
+    echo_verbose "pad png image ${PNG_IN}"
+
+    # put the metadata qr code under
+    local CRRT_PNG_X_SIZE=$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f1)
+    local CRRT_PNG_Y_SIZE=$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f2)
+
+    show_debug_variable "CRRT_PNG_X_SIZE"
+    show_debug_variable "CRRT_PNG_Y_SIZE"
+
+    local ADD_RIGHT=$(( (${A4_PIXELS_WIDTH}-${CRRT_PNG_X_SIZE}) / 2 ))
+    local ADD_LEFT=$(( ${A4_PIXELS_WIDTH} - ${CRRT_PNG_X_SIZE} - ${ADD_RIGHT}  ))
+
+    local ADD_TOP=$(( (${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE}) / 2 ))
+    local ADD_BOTTOM=$(( ${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE} - ${ADD_TOP} ))
+
+    show_debug_variable "ADD_RIGHT"
+    show_debug_variable "ADD_LEFT"
+
+    show_debug_variable "ADD_TOP"
+    show_debug_variable "ADD_BOTTOM"
+
+    convert -size ${ADD_LEFT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/left_margin.png
+    convert -size ${ADD_RIGHT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/right_margin.png
+
+    convert ${BASE_FOLDER}/left_margin.png ${PNG_IN} ${BASE_FOLDER}/right_margin.png +append ${BASE_FOLDER}/padded_left_right.png
+
+    echo_verbose "padded right left"
+
+    convert -size ${FINAL_X_SIZE}x${ADD_TOP} xc:white ${BASE_FOLDER}/top_margin.png
+    convert -size ${FINAL_X_SIZE}x${ADD_BOTTOM} xc:white ${BASE_FOLDER}/bottom_margin.png
+
+    convert ${BASE_FOLDER}/top_margin.png ${BASE_FOLDER}/padded_left_right.png ${BASE_FOLDER}/bottom_margin.png -append ${PNG_OUT}
+
+    echo "padded top bottom"
+
+}
+
 # TODO: give several digests possible including none
 # the digest function to use
 # this is not for cryptographic reasons,
@@ -695,15 +744,35 @@ assemble_into_A4(){
     convert -size ${A4_RIGHT_MARGIN}x${A4_TEXT_HEIGHT} xc:white ${FOLDER_NAME}/text_right_margin.png
 
     # TODO: put relevant metadata here in plaintex
+    # TODO: use automatic padding function to pad
+    # TODO: force adding line breaks on the metadata to avoid cutting text.
     echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_1st_page.txt
     echo "some relevant metadata" >> ${FOLDER_NAME}/text_1st_page.txt
+    # TODO: file name, date, how stored, number of pages
     echo -n "\"" >> ${FOLDER_NAME}/text_1st_page.txt
 
     convert -size ${A4_TEXT_WIDTH}x${A4_TEXT_HEIGHT} xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_1st_page.txt ${FOLDER_NAME}/text_1st_page.png
 
     convert ${FOLDER_NAME}/text_left_margin.png ${FOLDER_NAME}/text_1st_page.png ${FOLDER_NAME}/text_right_margin.png +append ${FOLDER_NAME}/text_image_chunk.png
 
-    # put the metadata qr code under
+    # put the layout qr code under
+    touch ${FOLDER_NAME}/layout_metadata.txt
+    echo "LEFT_MARGIN:${A4_LEFT_MARGIN}" >> ${FOLDER_NAME}/layout_metadata.txt
+    echo "RIGHT_MARGIN:${A4_RIGHT_MARGIN}" >> ${FOLDER_NAME}/layout_metadata.txt
+    echo "TOP_MARGIN:${A4_TOP_MARGIN}" >> ${FOLDER_NAME}/layout_metadata.txt
+    echo "BOTTOM_MARGIN:${A4_BOTTOM_MARGIN}" >> ${FOLDER_NAME}/layout_metadata.txt
+
+    perform_qr_encoding ${FOLDER_NAME}/layout_metadata.txt ${FOLDER_NAME}/layout_metadata
+    
+    local SIZE_Y_METADATA_LAYOUT=300
+
+    pad_png_image ${FOLDER_NAME}/layout_metadata.png ${A4_PIXELS_WIDTH} ${SIZE_Y_METADATA_LAYOUT} ${FOLDER_NAME}/metadata_layout_padded.png
+
+    local SIZE_Y_METADATA_DATA=$(( ${A4_PIXELS_HEIGHT} - ${A4_TEXT_HEIGHT} - ${SIZE_Y_METADATA_LAYOUT} ))
+
+    pad_png_image ${FOLDER_NAME}/metadata.png ${A4_PIXELS_WIDTH} ${SIZE_Y_METADATA_DATA} ${FOLDER_NAME}/metadata_data_padded.png
+
+    convert ${FOLDER_NAME}/text_1st_page.png ${FOLDER_NAME}/metadata_layout_padded.png ${FOLDER_NAME}/metadata_data_padded.png -append ${FOLDER_NAME}/first_page_full.png
 
     # on all pages: use a fixed layout corresponding to the max number of bytes ie max size of the qr codes
 
