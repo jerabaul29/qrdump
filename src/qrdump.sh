@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: make sure use fixed format for numberings, otherwise the ordering of the files is broken (10 is before 2)
+
 # TODO: separate the different parts of the logics in different files, clean, etc
 
 # TODO: user-defined message to put on all dumps instead of 'relevant metadata'
@@ -206,7 +208,7 @@ then
 fi
 
 # check valid folder if layout | decode
-if [[ "${ACTION}" =~ ^(cat|Decode|Layout|ReadPDF)$ ]]
+if [[ "${ACTION}" =~ ^(cat|Decode|Layout)$ ]]
 then
     FOLDER_NAME=$1
     echo_verbose "qr-code decoding of ${FOLDER_NAME}"
@@ -408,6 +410,42 @@ create_banner_of_qr_codes(){
 
         create_banner_of_qr_codes ${NEXT_BANNER_NUMBER} ${FOLDER_NAME} ${NEXT_LIST_DATA_QR}
     fi
+}
+
+int_with_5_digits(){
+    printf "%05d\n" $1
+}
+
+extract_QR_codes_from_pages(){
+    local BASE_FOLDER=$1
+    local CRRT_QR_CODE_NBR=0
+
+    echo_verbose "extract QR codes from pages..."
+
+    for CRRT_PAGE in ${BASE_FOLDER}/extracted_A4_page_*\.png
+    do
+        # split the QR codes
+        show_debug_variable "CRRT_PAGE"
+
+        # first banner
+        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+
+        # second banner
+        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+
+        # third banner
+        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+
+    done
 }
 
 create_page_of_qr_banners(){
@@ -950,17 +988,46 @@ assemble_into_A4(){
 
 
 read_pdf_A4(){
+    # TODO: move all of the operations to a tmp folder
+    echo_verbose "start to read PDF A4 ${FILE_NAME}"
+
+    local BASE_FOLDER=$(dirname "${FILE_NAME}")
+
     # split pages
+    convert -density 72 ${FILE_NAME} ${BASE_FOLDER}/extracted_A4_page_%04d.png
+
+    # for ease, rename the metadata page
+    mv ${BASE_FOLDER}/extracted_A4_page_0000.png ${BASE_FOLDER}/extracted_A4_metadata.png
 
     # first metadata: QR-code about layout, Qr-code about metadata
     # TODO: info about how to cut to extract the metadata
     # TODO: info about number of pages, number of qr data codes, etc
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[475x250+0+0]" ${BASE_FOLDER}/extracted_text.png
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x300+0+250]" ${BASE_FOLDER}/extracted_layout_metadata.png
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x292+0+550]" ${BASE_FOLDER}/extracted_dump_metadata.png
 
     # then the data pages
+    extract_QR_codes_from_pages ${BASE_FOLDER}
 
-    # extract page after page
+    # clean over numerous empty QR codes
+    # TODO: do this clearly from metadata, this is a hack
+    echo_verbose "testing for empty restored qr codes"
 
-    # all qr codes generated, ready to call extract if wanted.
+    for CRRT_QR_CODE in ${BASE_FOLDER}/qr_code_data_*.png
+    do
+        show_debug_variable "CRRT_QR_CODE"
+
+        local IS_EMPTY=$(identify -format "%[fx:(mean==1)?1:0]" ${CRRT_QR_CODE})
+        show_debug_variable "IS_EMPTY"
+
+        if [[ ${IS_EMPTY} = "0" ]]
+        then
+            echo_verbose "non empty qr code"
+        else
+            echo_verbose "empty qr code, delete"
+            rm ${CRRT_QR_CODE}
+        fi
+    done
 
 }
 

@@ -56,6 +56,13 @@ cd ..
 
 bash ./qrdump.sh --layout --base64 -b -v dummy
 
+shopt -s extglob 
+cd dummy
+rm -- !(full_layout_QR_dump.pdf)
+cd ..
+
+bash ./qrdump.sh --read-pdf --base64 -b -v dummy/full_layout_QR_dump.pdf
+
 press_any
 
 rm -rf dummy
