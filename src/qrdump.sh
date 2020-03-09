@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # TODO: make sure use fixed format for numberings, otherwise the ordering of the files is broken (10 is before 2)
+# TODO: make sure all tmps are cleaned after use
 
 # TODO: separate the different parts of the logics in different files, clean, etc
 
@@ -61,12 +62,11 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
     exit 1
 fi
 
-# acceptable options
-OPTIONS=hvbg:edlro:
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf,output:
+# TODO: implement the c and r
 
-# TODO: add the --dump - d and the --extract -e options
-# TODO: to allow the previous, change --debug -d to -b --debug
+# acceptable options
+OPTIONS=hvbg:edlro:cr
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf,output:,create-A4,recover
 
 # default values of the options
 HELP="False"
@@ -94,6 +94,14 @@ eval set -- "$PARSED"
 # now enjoy the options in order and nicely split until we see --
 while true; do
     case "$1" in
+        -c|--create-A4)
+            ACTION="CreateA4"
+            shift
+            ;;
+        -r|--recover)
+            ACTION="Recover"
+            shift
+            ;;
         -o|--output)
             OUTPUT="$2"
             shift 2
@@ -201,7 +209,7 @@ show_debug_file_binary(){
 ##############################################
 
 # check valid filename if encode
-if [[ "${ACTION}" =~ ^(Encode|ReadPDF)$ ]]
+if [[ "${ACTION}" =~ ^(Encode|ReadPDF|CreateA4|Recover)$ ]]
 then
     FILE_NAME=$1
     echo_verbose "qr-code archiving of ${FILE_NAME}"
@@ -214,7 +222,7 @@ fi
 
 # for now request an output location: directory or filename
 # NOTE: now asking for a directory no choice, may be bad, may want to change that later.
-if [[ "${ACTION}" =~ ^(cat|Encode)$ ]]; then
+if [[ "${ACTION}" =~ ^(cat|Encode|CreateA4|Recover)$ ]]; then
     if [[ ${OUTPUT} = "None" ]]
     then
         echo "performing encode requires a folder destination for putting the QR codes!"
@@ -250,7 +258,7 @@ then
 fi
 
 # check using valid action
-if [[ "${ACTION}" =~ ^(cat|Encode|Decode|Layout|ReadPDF)$ ]]; then
+if [[ "${ACTION}" =~ ^(cat|Encode|Decode|Layout|ReadPDF|CreateA4|Recover)$ ]]; then
     echo_verbose "valid action"
 else
     echo "invalid action: ACTION is now ${ACTION}."
@@ -1261,4 +1269,46 @@ if [[ "${ACTION}" = "ReadPDF" ]]
 then
     echo_verbose "Extracting the QR codes of a PDF dump"
     read_pdf_A4
+fi
+
+if [[ "${ACTION}" = "CreateA4" ]]
+then
+    echo_verbose "Create an A4 dump of a file"
+    
+    TMP_DIR=$(mktemp -d)
+
+    # create the qr codes inside a tmp 
+    MASTER_OUTPUT=${OUTPUT}
+    OUTPUT=${TMP_DIR}
+
+    full_encode
+
+    # generate the A4 from the tmp
+    FOLDER_NAME=${OUTPUT}
+    OUTPUT=${MASTER_OUTPUT}
+
+    assemble_into_A4
+
+    rm -rf ${TMP_DIR}
+fi
+
+if [[ "${ACTION}" = "Recover" ]]
+then
+    echo_verbose "Recover a file from an A4 dump"
+
+    TMP_DIR=$(mktemp -d)
+
+    # extract the qr codes inside a tmp
+    MASTER_OUTPUT=${OUTPUT}
+    OUTPUT=${TMP_DIR}
+
+    read_pdf_A4
+
+    # generate the file from the tmp
+    FOLDER_NAME=${OUTPUT}
+    OUTPUT=${MASTER_OUTPUT}
+
+    full_decode
+
+    rm -rf ${TMP_DIR}
 fi
