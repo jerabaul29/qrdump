@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# TODO: hide garbage under tmp carpet
-# make a nice stable API
-# then iterate for code quality
-
 # TODO: make sure use fixed format for numberings, otherwise the ordering of the files is broken (10 is before 2)
 
 # TODO: separate the different parts of the logics in different files, clean, etc
@@ -66,8 +62,8 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
 fi
 
 # acceptable options
-OPTIONS=hvbgedlr
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf
+OPTIONS=hvbg:edlro:
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf,output:
 
 # TODO: add the --dump - d and the --extract -e options
 # TODO: to allow the previous, change --debug -d to -b --debug
@@ -79,6 +75,7 @@ ENCODING="binary"  # TODO: add to options; use base64 so long
 DEBUG="False"
 DIGEST="sha1sum"
 ACTION="None"
+OUTPUT="None"
 
 # -regarding ! and PIPESTATUS see above
 # -temporarily store output to be able to check for errors
@@ -97,6 +94,10 @@ eval set -- "$PARSED"
 # now enjoy the options in order and nicely split until we see --
 while true; do
     case "$1" in
+        -o|--output)
+            OUTPUT="$2"
+            shift 2
+            ;;
         -h|--help)
             HELP="True"
             shift
@@ -211,6 +212,22 @@ then
     fi
 fi
 
+# for now request an output location: directory or filename
+# NOTE: now asking for a directory no choice, may be bad, may want to change that later.
+if [[ "${ACTION}" =~ ^(cat|Encode)$ ]]; then
+    if [[ ${OUTPUT} = "None" ]]
+    then
+        echo "performing encode requires a folder destination for putting the QR codes!"
+        exit 1
+    fi
+else
+    if [[ ${OUTPUT} = "None" ]]
+    then
+        echo "performing decode | A4 layout | PDF reading requires a folder destination for putting the results!"
+        exit 1
+    fi
+fi
+
 # check valid folder if layout | decode
 if [[ "${ACTION}" =~ ^(cat|Decode|Layout)$ ]]
 then
@@ -252,6 +269,7 @@ show_debug_variable "ENCODING"
 show_debug_variable "DEBUG"
 show_debug_variable "DIGEST"
 show_debug_variable "ACTION"
+show_debug_variable "OUTPUT"
 
 # TODO: add description / manpage (see what is below)
 
@@ -767,7 +785,8 @@ full_encode(){
     echo_verbose "start qr-code archiving..."
 
     # generate a random signature ID for the package
-    ID=$(dd if=/dev/urandom bs=${SIZE_ID} count=1 status=none)
+    ID=$(dd if=/dev/urandom bs=${SIZE_ID} count=1 status=none | tr '\r\n' ' ' | tr ':' ' ' )
+
     echo_verbose "random ID:"
 
     if [[ "${VERBOSE}" = "True" ]]
@@ -880,7 +899,7 @@ full_encode(){
     for CRRT_QR_CODE in ${TMP_DIR}/*\.png; do
         CRRT_DESTINATION="$(basename ${CRRT_QR_CODE})"
         echo_verbose "move ${CRRT_QR_CODE} to ${CRRT_DESTINATION}"
-        cp ${CRRT_QR_CODE} ${CRRT_DESTINATION}
+        cp ${CRRT_QR_CODE} ${OUTPUT}/${CRRT_DESTINATION}
     done
 
     # delete temporary folder
@@ -1057,6 +1076,16 @@ full_decode(){
     # NOTE: this works now because the original files were in the tmp dict at encoding...
     # TODO: do all intermediate operations in a tmp
 
+    # to all these operations in a tmp folder
+    local TMP_DIR=$(mktemp -d)
+    echo_verbose "created working tmp: ${TMP_DIR}"
+    cp -r ${FOLDER_NAME}/* ${TMP_DIR}/.
+    echo "give time to copy otherwise decoding will fail"
+    sleep 10
+
+    local GENERAL_FOLDER_NAME=${FOLDER_NAME}
+    FOLDER_NAME=${TMP_DIR}
+
     # decode metadata
     local TO_DECODE="${FOLDER_NAME}/metadata.png"
     local DESTINATION="${FOLDER_NAME}/metadata"
@@ -1153,6 +1182,10 @@ full_decode(){
     mv ${ASSEMBLED_UNCOMPRESSED} ${OUTPUT_FILE}
 
     echo_verbose "success with gunzip"
+
+    cp ${OUTPUT_FILE} ${OUTPUT}
+    FOLDER_NAME=${GENERAL_FOLDER_NAME}
+    rm -rf ${TMP_DIR}
 }
 
 

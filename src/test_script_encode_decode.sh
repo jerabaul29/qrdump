@@ -49,39 +49,33 @@ fi
 
 mkdir dummy
 cd dummy
+mkdir qr_codes
+mkdir decoded
 
 give_access
 
 head -c 4096 </dev/urandom > dummy_file.dat
 
-# TODO: take sha of it
-DIGEST_IN=$(sha512sum dummy_file.dat | awk '{print $1;}')
+cd ..
+
+DIGEST_IN=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
 echo "digest of the random file:"
 echo ${DIGEST_IN}
 
-bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
+./qrdump.sh --base64 -b --encode -v --output ./dummy/qr_codes dummy/dummy_file.dat
 
 echo "encoding finished"
-# TODO: maybe cleaning should be done another place or something like that
-echo "clean the initial file"
-mv dummy_file.dat dummy_file_start.dat
 
-# TODO: wonder if some sort of delay needed here to make sure files are copied etc
-# and to avoid base64 problem?
 echo "WAIT SO THAT FILES ARE FULLY COPIED, OTHERWISE ERROR"
 sleep 10
 
-cd ..
-
 press_any
 
-# TODO: clean
-# TODO: decode
-bash ./qrdump.sh --base64 -b -d -v dummy
+bash ./qrdump.sh --base64 -b --decode -v --output ./dummy/decoded/ dummy/qr_codes/
 
 echo "decoding finished"
 press_any
-DIGEST_OUT=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
+DIGEST_OUT=$(sha512sum dummy/decoded/dummy_file.dat | awk '{print $1;}')
 echo "digest of the decrypted file:"
 echo ${DIGEST_OUT}
 
