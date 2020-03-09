@@ -24,7 +24,11 @@ The package is a set of bash scripts and functions to make it easy to:
 
 ## layout / extraction
 - putting qr codes from the encoding in a series of A4 pages: working.
-- extract the qr codes from layout in a series of A4 pages: currently under progress.
+- extract the qr codes from layout in a series of A4 pages: working.
+
+## code cleaning
+- avoid polluting folders with tmp files (ie move temporaty stuff to tmp files): under progress
+- stabilize APIs: todo
 
 # installation
 
