@@ -437,12 +437,36 @@ create_page_of_qr_banners(){
         local SECOND_DATA_TO_USE=$4
     fi
 
+    show_debug_variable "FIRST_DATA_TO_USE"
+    show_debug_variable "SECOND_DATA_TO_USE"
+    show_debug_variable "THIRD_DATA_TO_USE"
+
     convert -size 595x11 xc:white ${FOLDER_NAME}/padding_page_top.png
     convert -size 595x7 xc:white ${FOLDER_NAME}/padding_page_middle.png
     convert -size 595x10 xc:white ${FOLDER_NAME}/padding_page_bottom.png
 
-    convert 
+    convert ${FOLDER_NAME}/padding_page_top.png \
+        ${FIRST_DATA_TO_USE} \
+        ${FOLDER_NAME}/padding_page_middle.png \
+        ${SECOND_DATA_TO_USE} \
+        ${FOLDER_NAME}/padding_page_middle.png \
+        ${THIRD_DATA_TO_USE} \
+        ${FOLDER_NAME}/padding_page_bottom.png \
+        -append \
+        ${FOLDER_NAME}/data_page_${PAGE_NUMBER}.png
 
+    # if some banners left, generate more banners
+    if [ "$#" -gt 5 ]
+    then
+        local NEXT_PAGE_NUMBER=$(( ${PAGE_NUMBER} + 1 ))
+        shift 5
+        local NEXT_LIST_DATA_BANNER="$*"
+
+        show_debug_variable "NEXT_PAGE_NUMBER"
+        show_debug_variable "NEXT_LIST_DATA_BANNER"
+
+        create_page_of_qr_banners ${NEXT_PAGE_NUMBER} ${FOLDER_NAME} ${NEXT_LIST_DATA_BANNER}
+    fi
 }
 
 # TODO: give several digests possible including none
@@ -899,6 +923,8 @@ assemble_into_A4(){
     create_banner_of_qr_codes 1 ${FOLDER_NAME} ${LIST_PADDED_QR_DATA}
 
     # glue together banners to create pages
+    local LIST_BANNER_QR_DATA=$(ls ${FOLDER_NAME}/banner_*\.png | tr '\r\n' ' ')
+    create_page_of_qr_banners 1 ${FOLDER_NAME} ${LIST_BANNER_QR_DATA}
 
 
 
