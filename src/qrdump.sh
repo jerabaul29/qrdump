@@ -402,6 +402,49 @@ create_banner_of_qr_codes(){
     fi
 }
 
+create_page_of_qr_banners(){
+    # TODO: put a short text at the top (may need making a bit more space)
+
+    echo_verbose "creating the banners with arguments..."
+     for i in $*; do 
+       echo_verbose $i 
+     done
+
+    # check that at least 3 args (ie the first 2 + at least 1 data qr code)
+    if [ "$#" -lt 3 ]
+    then
+        echo "too few arguments to generate a banner!"
+        exit 1
+    fi
+
+    local PAGE_NUMBER=$1
+    local FOLDER_NAME=$2
+
+    local FIRST_DATA_TO_USE=$3
+
+    if [ "$#" -lt 5 ]
+    then
+        convert -size 595 xc:white ${FOLDER_NAME}/empty_padded_qr.png
+        local THIRD_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
+    else
+        local THIRD_DATA_TO_USE=$5
+    fi
+
+    if [ "$#" -lt 4 ]
+    then
+        local SECOND_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
+    else
+        local SECOND_DATA_TO_USE=$4
+    fi
+
+    convert -size 595x11 xc:white ${FOLDER_NAME}/padding_page_top.png
+    convert -size 595x7 xc:white ${FOLDER_NAME}/padding_page_middle.png
+    convert -size 595x10 xc:white ${FOLDER_NAME}/padding_page_bottom.png
+
+    convert 
+
+}
+
 # TODO: give several digests possible including none
 # the digest function to use
 # this is not for cryptographic reasons,
