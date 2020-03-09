@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: user-defined message to put on all dumps instead of 'relevant metadata'
+
 # TODO: make sure null bytes do not break stuff!
 # TODO: metadata QR: give them a signature: title line METADATAQRDUMP or similar
 
@@ -56,8 +58,8 @@ if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
 fi
 
 # acceptable options
-OPTIONS=hvbgedl
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout
+OPTIONS=hvbgedlr
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf
 
 # TODO: add the --dump - d and the --extract -e options
 # TODO: to allow the previous, change --debug -d to -b --debug
@@ -117,6 +119,10 @@ while true; do
             ;;
         -l|--layout)
             ACTION="Layout"
+            shift
+            ;;
+        -r|--read-pdf)
+            ACTION="ReadPDF"
             shift
             ;;
         --)
@@ -186,7 +192,7 @@ show_debug_file_binary(){
 ##############################################
 
 # check valid filename if encode
-if [[ "${ACTION}" = "Encode" ]]
+if [[ "${ACTION}" =~ ^(Encode|ReadPDF)$ ]]
 then
     FILE_NAME=$1
     echo_verbose "qr-code archiving of ${FILE_NAME}"
@@ -198,7 +204,7 @@ then
 fi
 
 # check valid folder if layout | decode
-if [[  "${ACTION}" =~ ^(cat|Decode|Layout)$ ]]
+if [[ "${ACTION}" =~ ^(cat|Decode|Layout|ReadPDF)$ ]]
 then
     FOLDER_NAME=$1
     echo_verbose "qr-code decoding of ${FOLDER_NAME}"
@@ -219,7 +225,7 @@ then
 fi
 
 # check using valid action
-if [[ "${ACTION}" =~ ^(cat|Encode|Decode|Layout)$ ]]; then
+if [[ "${ACTION}" =~ ^(cat|Encode|Decode|Layout|ReadPDF)$ ]]; then
     echo_verbose "valid action"
 else
     echo "invalid action: ACTION is now ${ACTION}."
@@ -941,7 +947,20 @@ assemble_into_A4(){
 }
 
 
-# To get information about a png: use ''identify' command
+read_pdf_A4(){
+    # split pages
+
+    # first metadata: QR-code about layout, Qr-code about metadata
+    # TODO: info about how to cut to extract the metadata
+    # TODO: info about number of pages, number of qr data codes, etc
+
+    # then the data pages
+
+    # extract page after page
+
+    # all qr codes generated, ready to call extract if wanted.
+
+}
 
 
 
@@ -1046,8 +1065,6 @@ full_decode(){
         dd if="${CRRT_METADATA}" of="${FILE_CRRT_RANK}" skip=28 count=2 iflag=skip_bytes,count_bytes status=none
         show_debug_file_binary "FILE_CRRT_RANK"
 
-
-
         # TODO: make robust checks
         # check that order of the segments corresponds
         # check that Id corresponds
@@ -1099,4 +1116,10 @@ if [[ "${ACTION}" = "Layout" ]]
 then
     echo_verbose "doing a A4 layout of a dump"
     assemble_into_A4
+fi
+
+if [[ "${ACTION}" = "ReadPDF" ]]
+then
+    echo_verbose "Extracting the QR codes of a PDF dump"
+    read_pdf_A4
 fi
