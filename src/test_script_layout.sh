@@ -74,7 +74,7 @@ bash ./qrdump.sh --read-pdf --base64 -b -v --output ./dummy/extracted_A4_qr_code
 # decode
 bash ./qrdump.sh --base64 -b -d -v --output dummy/decoded dummy/extracted_A4_qr_codes
 
-DIGEST_OUT=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
+DIGEST_OUT=$(sha512sum dummy/decoded/dummy_file.dat | awk '{print $1;}')
 echo "digest of the decrypted file:"
 echo ${DIGEST_OUT}
 
