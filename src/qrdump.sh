@@ -416,6 +416,10 @@ int_with_5_digits(){
     printf "%05d\n" $1
 }
 
+int_with_2_digits(){
+    printf "%02d\n" $1
+}
+
 extract_QR_codes_from_pages(){
     local BASE_FOLDER=$1
     local CRRT_QR_CODE_NBR=0
@@ -428,21 +432,21 @@ extract_QR_codes_from_pages(){
         show_debug_variable "CRRT_PAGE"
 
         # first banner
-        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
         # second banner
-        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
         # third banner
-        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/qr_code_data_$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
     done
@@ -1004,7 +1008,7 @@ read_pdf_A4(){
     # TODO: info about number of pages, number of qr data codes, etc
     convert "${BASE_FOLDER}/extracted_A4_metadata.png[475x250+0+0]" ${BASE_FOLDER}/extracted_text.png
     convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x300+0+250]" ${BASE_FOLDER}/extracted_layout_metadata.png
-    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x292+0+550]" ${BASE_FOLDER}/extracted_dump_metadata.png
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x292+0+550]" ${BASE_FOLDER}/metadata.png
 
     # then the data pages
     extract_QR_codes_from_pages ${BASE_FOLDER}

@@ -48,20 +48,27 @@ give_access
 
 head -c 4096 </dev/urandom > dummy_file.dat
 
+# encode as qr codes
 bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
 
 sleep 5
 
 cd ..
 
+# generate the A4 dump
 bash ./qrdump.sh --layout --base64 -b -v dummy
 
+# clean all except the A4 dump
 shopt -s extglob 
 cd dummy
 rm -- !(full_layout_QR_dump.pdf)
 cd ..
 
+# extract QR codes from the A4
 bash ./qrdump.sh --read-pdf --base64 -b -v dummy/full_layout_QR_dump.pdf
+
+# decode
+bash ./qrdump.sh --base64 -b -d -v dummy
 
 press_any
 
