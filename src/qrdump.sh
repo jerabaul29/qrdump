@@ -307,11 +307,23 @@ pad_png_image(){
     local CRRT_PNG_X_SIZE=$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f1)
     local CRRT_PNG_Y_SIZE=$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f2)
 
+    if [[ ${FINAL_X_SIZE} -le ${CRRT_PNG_X_SIZE} ]]
+    then
+        echo "*** ERROR *** the padded X size ${FINAL_X_SIZE} is smaller or equal than the input size ${CRRT_PNG_X_SIZE}"
+        exit 1
+    fi
+
+    if [[ ${FINAL_Y_SIZE} -le ${CRRT_PNG_Y_SIZE} ]]
+    then
+        echo "*** ERROR *** the padded Y size ${FINAL_Y_SIZE} is smaller or equal than the input size ${CRRT_PNG_Y_SIZE}"
+        exit 1
+    fi
+
     show_debug_variable "CRRT_PNG_X_SIZE"
     show_debug_variable "CRRT_PNG_Y_SIZE"
 
-    local ADD_RIGHT=$(( (${A4_PIXELS_WIDTH}-${CRRT_PNG_X_SIZE}) / 2 ))
-    local ADD_LEFT=$(( ${A4_PIXELS_WIDTH} - ${CRRT_PNG_X_SIZE} - ${ADD_RIGHT}  ))
+    local ADD_RIGHT=$(( (${FINAL_X_SIZE}-${CRRT_PNG_X_SIZE}) / 2 ))
+    local ADD_LEFT=$(( ${FINAL_X_SIZE} - ${CRRT_PNG_X_SIZE} - ${ADD_RIGHT}  ))
 
     local ADD_TOP=$(( (${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE}) / 2 ))
     local ADD_BOTTOM=$(( ${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE} - ${ADD_TOP} ))
@@ -479,8 +491,10 @@ show_debug_variable "SIZE_DIGEST"
 # to be nice to possible bad printers
 # TODO: automatically get the digest function size
 # TODO: make this size an arg
+# this is 69x69 pixels
 MAX_QR_SIZE=331
 show_debug_variable "MAX_QR_SIZE"
+MAX_QR_SIZE_PIXELS=0
 
 # the rank size in the data QR metadata
 # TODO: allow to change if necessary
@@ -703,6 +717,8 @@ full_encode(){
 
 
 
+
+
 # TODO: have a 'main' section where most of the actual
 # work is done
 
@@ -775,6 +791,18 @@ assemble_into_A4(){
     convert ${FOLDER_NAME}/text_1st_page.png ${FOLDER_NAME}/metadata_layout_padded.png ${FOLDER_NAME}/metadata_data_padded.png -append ${FOLDER_NAME}/first_page_full.png
 
     # on all pages: use a fixed layout corresponding to the max number of bytes ie max size of the qr codes
+    # TODO: make it adaptive; currently it is hard coded following the choice of bytes per qr-code
+
+    # pad to a slightly larger size; this is hard coded, consider to fix?
+    for CRRT_FILE in ${FOLDER_NAME}/data-??.png; do
+        local BASE_NAME=$(basename ${CRRT_FILE})
+        pad_png_image ${CRRT_FILE} 269 269 ${FOLDER_NAME}/padded_${BASE_NAME}
+    done
+
+    # glue together 2 and 2 images to create a banner
+
+    # glue together banners to create pages
+
 
 
 
