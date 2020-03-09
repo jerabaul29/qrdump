@@ -424,7 +424,7 @@ create_page_of_qr_banners(){
 
     if [ "$#" -lt 5 ]
     then
-        convert -size 595 xc:white ${FOLDER_NAME}/empty_padded_qr.png
+        convert -size 595x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
         local THIRD_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
     else
         local THIRD_DATA_TO_USE=$5
@@ -441,9 +441,17 @@ create_page_of_qr_banners(){
     show_debug_variable "SECOND_DATA_TO_USE"
     show_debug_variable "THIRD_DATA_TO_USE"
 
-    convert -size 595x11 xc:white ${FOLDER_NAME}/padding_page_top.png
-    convert -size 595x7 xc:white ${FOLDER_NAME}/padding_page_middle.png
-    convert -size 595x10 xc:white ${FOLDER_NAME}/padding_page_bottom.png
+    echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_top.txt
+    # TODO: put some relevant metadata
+    echo "PAGE ${PAGE_NUMBER}; some relevant metadata" >> ${FOLDER_NAME}/text_top.txt
+    echo -n "\"" >> ${FOLDER_NAME}/text_top.txt
+
+    convert -size 595x32 xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_top.txt ${FOLDER_NAME}/padding_page_top.png
+
+    rm ${FOLDER_NAME}/text_top.txt
+
+    convert -size 595x1 xc:white ${FOLDER_NAME}/padding_page_middle.png
+    convert -size 595x1 xc:white ${FOLDER_NAME}/padding_page_bottom.png
 
     convert ${FOLDER_NAME}/padding_page_top.png \
         ${FIRST_DATA_TO_USE} \
@@ -926,10 +934,9 @@ assemble_into_A4(){
     local LIST_BANNER_QR_DATA=$(ls ${FOLDER_NAME}/banner_*\.png | tr '\r\n' ' ')
     create_page_of_qr_banners 1 ${FOLDER_NAME} ${LIST_BANNER_QR_DATA}
 
+    # put all the pages together
+    img2pdf --pagesize A4 -o ${FOLDER_NAME}/full_layout_QR_dump.pdf ${FOLDER_NAME}/first_page_full.png ${FOLDER_NAME}/data_page_*.png
 
-
-
-    
     sleep 1
 }
 
