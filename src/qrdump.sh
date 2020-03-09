@@ -1017,7 +1017,7 @@ read_pdf_A4(){
     # TODO: do this clearly from metadata, this is a hack
     echo_verbose "testing for empty restored qr codes"
 
-    for CRRT_QR_CODE in ${BASE_FOLDER}/qr_code_data_*.png
+    for CRRT_QR_CODE in ${BASE_FOLDER}/data-??.png
     do
         show_debug_variable "CRRT_QR_CODE"
 

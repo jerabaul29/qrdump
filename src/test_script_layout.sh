@@ -48,6 +48,10 @@ give_access
 
 head -c 4096 </dev/urandom > dummy_file.dat
 
+DIGEST_IN=$(sha512sum dummy_file.dat | awk '{print $1;}')
+echo "digest of the random file:"
+echo ${DIGEST_IN}
+
 # encode as qr codes
 bash ../qrdump.sh --base64 -b -e -v dummy_file.dat
 
@@ -69,6 +73,18 @@ bash ./qrdump.sh --read-pdf --base64 -b -v dummy/full_layout_QR_dump.pdf
 
 # decode
 bash ./qrdump.sh --base64 -b -d -v dummy
+
+DIGEST_OUT=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
+echo "digest of the decrypted file:"
+echo ${DIGEST_OUT}
+
+if [[ "${DIGEST_IN}" = "${DIGEST_OUT}" ]]
+then
+    echo "success restoring!"
+else
+    echo "non identical file!"
+    exit 1
+fi
 
 press_any
 
