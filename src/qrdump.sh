@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: separate the different parts of the logics in different files, clean, etc
+
 # TODO: user-defined message to put on all dumps instead of 'relevant metadata'
 
 # TODO: make sure null bytes do not break stuff!
