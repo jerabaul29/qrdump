@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# TODO: hide garbage under tmp carpet
+# make a nice stable API
+# then iterate for code quality
+
 # TODO: make sure use fixed format for numberings, otherwise the ordering of the files is broken (10 is before 2)
 
 # TODO: separate the different parts of the logics in different files, clean, etc
