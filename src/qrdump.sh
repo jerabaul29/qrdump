@@ -923,6 +923,16 @@ full_encode(){
 # work is done
 
 assemble_into_A4(){
+
+    local TMP_DIR=$(mktemp -d)
+    echo_verbose "created working tmp: ${TMP_DIR}"
+    cp -r ${FOLDER_NAME}/* ${TMP_DIR}/.
+    echo "give time to copy otherwise decoding will fail"
+    sleep 10
+
+    local GENERAL_FOLDER_NAME=${FOLDER_NAME}
+    FOLDER_NAME=${TMP_DIR}
+
     # Equivalent A4 paper dimensions in pixels at 300 DPI and 72 DPI respectively are: 2480 pixels x 3508 pixels (print resolution) 595 pixels x 842 pixels (screen resolution)
     # TODO: compute with logics, allow to adapt to dpi
     # TODO: make all of that happen in a tmp
@@ -1011,14 +1021,28 @@ assemble_into_A4(){
     img2pdf --pagesize A4 -o ${FOLDER_NAME}/full_layout_QR_dump.pdf ${FOLDER_NAME}/first_page_full.png ${FOLDER_NAME}/data_page_*.png
 
     sleep 1
+
+    cp ${FOLDER_NAME}/full_layout_QR_dump.pdf ${OUTPUT}
+    FOLDER_NAME=${GENERAL_FOLDER_NAME}
+    rm -rf ${TMP_DIR}
 }
 
 
 read_pdf_A4(){
-    # TODO: move all of the operations to a tmp folder
+    
     echo_verbose "start to read PDF A4 ${FILE_NAME}"
 
     local BASE_FOLDER=$(dirname "${FILE_NAME}")
+
+    # to all these operations in a tmp folder
+    local TMP_DIR=$(mktemp -d)
+    echo_verbose "created working tmp: ${TMP_DIR}"
+    cp -r ${BASE_FOLDER}/* ${TMP_DIR}/.
+    echo "give time to copy otherwise decoding will fail"
+    sleep 10
+
+    local GENERAL_FOLDER_NAME=${BASE_FOLDER}
+    BASE_FOLDER=${TMP_DIR}
 
     # split pages
     convert -density 72 ${FILE_NAME} ${BASE_FOLDER}/extracted_A4_page_%04d.png
@@ -1056,6 +1080,11 @@ read_pdf_A4(){
         fi
     done
 
+    cp ${BASE_FOLDER}/extracted_layout_metadata.png ${OUTPUT}
+    cp ${BASE_FOLDER}/metadata.png ${OUTPUT}
+    cp ${BASE_FOLDER}/data-*.png ${OUTPUT}
+    BASE_FOLDER=${GENERAL_FOLDER_NAME}
+    rm -rf ${TMP_DIR}
 }
 
 
