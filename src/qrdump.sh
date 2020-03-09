@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# TODO: silence warning
+# https://stackoverflow.com/questions/48628878/error-in-converting-images-in-imagemagick?rq=1
+
 # TODO: make sure use fixed format for numberings, otherwise the ordering of the files is broken (10 is before 2)
 # TODO: make sure all tmps are cleaned after use
 
@@ -386,7 +389,7 @@ pad_png_image(){
 
     convert ${BASE_FOLDER}/top_margin.png ${BASE_FOLDER}/padded_left_right.png ${BASE_FOLDER}/bottom_margin.png -append ${PNG_OUT}
 
-    echo "padded top bottom"
+    echo_verbose "padded top bottom"
 
 }
 
@@ -814,7 +817,7 @@ full_encode(){
     gzip -vc9 ${FILE_NAME} > ${TMP_DIR}/compressed.gz
 
     echo_verbose "information about compressed binary file:"
-    ls -lrth ${TMP_DIR}/compressed.gz
+    # ls -lrth ${TMP_DIR}/compressed.gz
 
     # split the compressed file
     # into segments to be used for qr-codes.
@@ -1150,7 +1153,7 @@ full_decode(){
     # TODO: fix uppper case convention in this loop
     while read -r name value
     do
-        echo $name
+        echo_verbose $name
         # special treatment when debug display in case of binary data
         if [[ "${name}" = "ID" ]]
         then
