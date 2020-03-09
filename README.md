@@ -16,7 +16,15 @@ The package is a set of bash scripts and functions to make it easy to:
 
 # status
 
-Under heavy development, not yet ready for use - come back in a few weeks.
+**NOTE** things are *working* when a working implementation, possibly with flaws, is available. Things are *cleaning* when the cleaning is starting to be done and code starts to look nice. Things are *done* when satisfactory cleaning has taken place and production quality is met. See the TODOs / FIXMEs in the code for suggestion of how to improve / fix.
+
+## encoding / decoding
+- generating a list of qr dumps from arbitrary data: working.
+- decoding a list of qr dumps to arbitraty data: working.
+
+## layout / extraction
+- putting qr codes from the encoding in a series of A4 pages: currently under progress.
+- extract the qr codes from layout in a series of A4 pages: to be done.
 
 # installation
 
