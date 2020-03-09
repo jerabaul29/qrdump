@@ -350,6 +350,58 @@ pad_png_image(){
 
 }
 
+create_banner_of_qr_codes(){
+    # arguments:
+    # - first the banner number
+    # - first folder name
+    # - then the list of things to use for the banner
+    echo_verbose "creating the banners with arguments..."
+     for i in $*; do 
+       echo_verbose $i 
+     done
+
+    # check that at least 3 args (ie the first 2 + at least 1 data qr code)
+    if [ "$#" -lt 3 ]
+    then
+        echo "too few arguments to generate a banner!"
+        exit 1
+    fi
+
+    local BANNER_NUMBER=$1
+    local FOLDER_NAME=$2
+
+    local FIRST_DATA_TO_USE=$3
+
+    if [ "$#" -lt 4 ]
+    then
+        # need to create the second qr code as empty
+        convert -size 269x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
+        local SECOND_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
+    else
+        local SECOND_DATA_TO_USE=$4
+    fi
+
+
+    convert -size 23x269 xc:white ${FOLDER_NAME}/padding_banner_sides.png
+    convert -size 11x269 xc:white ${FOLDER_NAME}/padding_banner_middle.png
+
+    convert ${FOLDER_NAME}/padding_banner_sides.png ${FIRST_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_middle.png ${SECOND_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_sides.png +append ${FOLDER_NAME}/banner_${BANNER_NUMBER}.png
+
+    # TODO: RESUMEHERE
+    # if some data qr codes left, generate more banners
+    if [ "$#" -gt 4 ]
+    then
+        local NEXT_BANNER_NUMBER=$(( ${BANNER_NUMBER} + 1 ))
+        shift 4
+        local NEXT_LIST_DATA_QR="$*"
+
+        show_debug_variable "NEXT_BANNER_NUMBER"
+        show_debug_variable "NEXT_LIST_DATA_QR"
+
+        create_banner_of_qr_codes ${NEXT_BANNER_NUMBER} ${FOLDER_NAME} ${NEXT_LIST_DATA_QR}
+    fi
+}
+
 # TODO: give several digests possible including none
 # the digest function to use
 # this is not for cryptographic reasons,
@@ -800,6 +852,8 @@ assemble_into_A4(){
     done
 
     # glue together 2 and 2 images to create a banner
+    local LIST_PADDED_QR_DATA=$(ls ${FOLDER_NAME}/padded_data-??.png | tr '\r\n' ' ')
+    create_banner_of_qr_codes 1 ${FOLDER_NAME} ${LIST_PADDED_QR_DATA}
 
     # glue together banners to create pages
 
