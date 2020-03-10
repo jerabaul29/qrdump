@@ -78,8 +78,10 @@ The content of the **src** folder is simply a set of bash scripts
 
 Extensive list of TODOS at the moment:
 
-- make a full (even if limited) working example
 - develop unit testing
 - setup packaging
 - extend functionality following the TODOs in the source
+- pdf metadata should include relevant information
+- refactor inner code in particular paths etc and how they are given from one function to the other (make to arg instead of global variables)
+- clean the verbose outputs etc
 
