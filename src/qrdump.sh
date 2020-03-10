@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: the &> /dev/null on convert are to suppress a warning. In debug mode, do not suppress. fix why it is here.
+
 # TODO: silence warning
 # https://stackoverflow.com/questions/48628878/error-in-converting-images-in-imagemagick?rq=1
 
@@ -68,8 +70,8 @@ fi
 # TODO: implement the c and r
 
 # acceptable options
-OPTIONS=hvbg:edlro:cr
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf,output:,create-A4,recover
+OPTIONS=hvbg:edlro:crs
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,layout,read-pdf,output:,create-A4,recover,safe-mode
 
 # default values of the options
 HELP="False"
@@ -79,6 +81,7 @@ DEBUG="False"
 DIGEST="sha1sum"
 ACTION="None"
 OUTPUT="None"
+SAFE_MODE="None"
 
 # -regarding ! and PIPESTATUS see above
 # -temporarily store output to be able to check for errors
@@ -99,6 +102,10 @@ while true; do
     case "$1" in
         -c|--create-A4)
             ACTION="CreateA4"
+            shift
+            ;;
+        -s|--safe-mode)
+            SAFE_MODE="True"
             shift
             ;;
         -r|--recover)
@@ -465,21 +472,21 @@ extract_QR_codes_from_pages(){
         show_debug_variable "CRRT_PAGE"
 
         # first banner
-        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
         # second banner
-        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
         # third banner
-        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png
+        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
     done
@@ -814,7 +821,7 @@ full_encode(){
     # compress the destination file
     # display information, use maximum compression
     echo_verbose "compressing file..."
-    gzip -vc9 ${FILE_NAME} > ${TMP_DIR}/compressed.gz
+    gzip -vc9 -q -qq ${FILE_NAME} > ${TMP_DIR}/compressed.gz
 
     echo_verbose "information about compressed binary file:"
     # ls -lrth ${TMP_DIR}/compressed.gz
@@ -1029,7 +1036,7 @@ assemble_into_A4(){
     create_page_of_qr_banners 1 ${FOLDER_NAME} ${LIST_BANNER_QR_DATA}
 
     # put all the pages together
-    img2pdf --pagesize A4 -o ${FOLDER_NAME}/full_layout_QR_dump.pdf ${FOLDER_NAME}/first_page_full.png ${FOLDER_NAME}/data_page_*.png
+    img2pdf --colorspace L --pagesize A4 -o ${FOLDER_NAME}/full_layout_QR_dump.pdf ${FOLDER_NAME}/first_page_full.png ${FOLDER_NAME}/data_page_*.png &> /dev/null
 
     sleep 1
 
@@ -1056,7 +1063,7 @@ read_pdf_A4(){
     BASE_FOLDER=${TMP_DIR}
 
     # split pages
-    convert -density 72 ${FILE_NAME} ${BASE_FOLDER}/extracted_A4_page_%04d.png
+    convert -density 72 ${FILE_NAME} ${BASE_FOLDER}/extracted_A4_page_%04d.png &> /dev/null
 
     # for ease, rename the metadata page
     mv ${BASE_FOLDER}/extracted_A4_page_0000.png ${BASE_FOLDER}/extracted_A4_metadata.png
@@ -1064,9 +1071,9 @@ read_pdf_A4(){
     # first metadata: QR-code about layout, Qr-code about metadata
     # TODO: info about how to cut to extract the metadata
     # TODO: info about number of pages, number of qr data codes, etc
-    convert "${BASE_FOLDER}/extracted_A4_metadata.png[475x250+0+0]" ${BASE_FOLDER}/extracted_text.png
-    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x300+0+250]" ${BASE_FOLDER}/extracted_layout_metadata.png
-    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x292+0+550]" ${BASE_FOLDER}/metadata.png
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[475x250+0+0]" ${BASE_FOLDER}/extracted_text.png &> /dev/null
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x300+0+250]" ${BASE_FOLDER}/extracted_layout_metadata.png &> /dev/null
+    convert "${BASE_FOLDER}/extracted_A4_metadata.png[595x292+0+550]" ${BASE_FOLDER}/metadata.png &> /dev/null
 
     # then the data pages
     extract_QR_codes_from_pages ${BASE_FOLDER}
@@ -1293,6 +1300,57 @@ then
     assemble_into_A4
 
     rm -rf ${TMP_DIR}
+
+    if [[ ${SAFE_MODE} = "True" ]]
+    then
+        echo "acting in safe mode; check that decoding is able to take place..."
+
+        echo_verbose "FILE_NAME"
+
+        FILE_NAME_BASENAME=$(basename ${FILE_NAME})
+
+        DIGEST_IN=$(sha512sum ${FILE_NAME} | awk '{print $1;}')
+        echo "digest of the input ${FILE_NAME}:"
+        echo ${DIGEST_IN}
+
+        echo "attempt to recover"
+
+        TMP_DIR=$(mktemp -d)
+
+        # extract the qr codes inside a tmp
+        FILE_NAME=${OUTPUT}
+        OUTPUT=${TMP_DIR}
+
+        echo_verbose "start to read the pdf"
+        echo_verbose "FILE_NAME"
+        echo_verbose "OUTPUT"
+
+        read_pdf_A4
+
+        # generate the file from the tmp
+        echo_verbose "start to decode"
+
+        FOLDER_NAME=${OUTPUT}
+        echo_verbose "FOLDER_NAME"
+
+        full_decode
+
+        DIGEST_OUT=$(sha512sum ${FOLDER_NAME}/${FILE_NAME_BASENAME} | awk '{print $1;}')
+        echo "digest of the decrypted file ${FOLDER_NAME}/${FILE_NAME_BASENAME}:"
+        echo ${DIGEST_OUT}
+
+        if [[ "${DIGEST_IN}" = "${DIGEST_OUT}" ]]
+        then
+            echo "Success restoring from the pdf! This means that the A4 dump has been successfully tested for data extraction."
+            echo "The A4 PDF is safe to consider as a recoverable dump of the data"
+        else
+            echo "non identical file!"
+            exit 1
+        fi
+
+        rm -rf ${TMP_DIR}
+
+    fi
 fi
 
 if [[ "${ACTION}" = "Recover" ]]
