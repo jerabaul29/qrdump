@@ -6,8 +6,7 @@
 # TODO: increase coverage
 # TODO: use fully extended options for lisibility
 
-mkdir dummy
-cd dummy
+source ./boilerplate.sh
 
 mkdir qr_codes
 mkdir decoded
@@ -50,3 +49,5 @@ fi
 # TODO: take sha of decoded and check integrity
 
 rm -rf dummy
+
+cd ../tests/

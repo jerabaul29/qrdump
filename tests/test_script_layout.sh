@@ -48,3 +48,5 @@ fi
 press_any
 
 rm -rf dummy
+
+cd ../tests/

@@ -1,7 +1,6 @@
 #/bin/bash
 
 source ./boilerplate.sh
-
 mkdir generated_pdf
 mkdir restored_result
 
@@ -38,3 +37,5 @@ fi
 press_any
 
 rm -rf dummy
+
+cd ../tests/
