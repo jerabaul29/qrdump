@@ -24,9 +24,7 @@ echo ${DIGEST_IN}
 ./qrdump.sh --base64 -b --encode -v --output ./dummy/qr_codes dummy/dummy_file.dat
 
 echo "encoding finished"
-
-echo "WAIT SO THAT FILES ARE FULLY COPIED, OTHERWISE ERROR"
-sleep 10
+sync
 
 press_any
 
