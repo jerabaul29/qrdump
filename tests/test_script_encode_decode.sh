@@ -1,5 +1,11 @@
 #/bin/bash
 
+# a small set of tests of the qrdump tools
+# TODO: move to its own folder
+# TODO: automate testing
+# TODO: increase coverage
+# TODO: use fully extended options for lisibility
+
 ##############################################
 # sounder programming environment            #
 ##############################################
@@ -32,8 +38,10 @@ give_access(){
 }
 
 ########################################
-# test API of direct to / from A4      #
+# test of encoding / decoding base64   #
 ########################################
+
+cd ../src/
 
 if [ -d "dummy" ]
 then
@@ -43,8 +51,8 @@ fi
 
 mkdir dummy
 cd dummy
-mkdir generated_pdf
-mkdir restored_result
+mkdir qr_codes
+mkdir decoded
 
 give_access
 
@@ -56,15 +64,20 @@ DIGEST_IN=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
 echo "digest of the random file:"
 echo ${DIGEST_IN}
 
-bash ./qrdump.sh --create-A4 --base64 -b -v --output ./dummy/generated_pdf/my_pdf.pdf ./dummy/dummy_file.dat
+./qrdump.sh --base64 -b --encode -v --output ./dummy/qr_codes dummy/dummy_file.dat
 
-echo "the pdf has been generated"
+echo "encoding finished"
+
+echo "WAIT SO THAT FILES ARE FULLY COPIED, OTHERWISE ERROR"
 sleep 10
+
 press_any
 
-bash ./qrdump.sh --recover --base64 -b -v --output ./dummy/restored_result/ ./dummy/generated_pdf/my_pdf.pdf
+bash ./qrdump.sh --base64 -b --decode -v --output ./dummy/decoded/ dummy/qr_codes/
 
-DIGEST_OUT=$(sha512sum dummy/restored_result/dummy_file.dat | awk '{print $1;}')
+echo "decoding finished"
+press_any
+DIGEST_OUT=$(sha512sum dummy/decoded/dummy_file.dat | awk '{print $1;}')
 echo "digest of the decrypted file:"
 echo ${DIGEST_OUT}
 
@@ -76,6 +89,6 @@ else
     exit 1
 fi
 
-press_any
+# TODO: take sha of decoded and check integrity
 
 rm -rf dummy

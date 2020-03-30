@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: unique ID: make it to base64 for robustness
+
 # TODO: the &> /dev/null on convert are to suppress a warning. In debug mode, do not suppress. fix why it is here.
 
 # TODO: silence warning

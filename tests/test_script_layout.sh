@@ -35,6 +35,8 @@ give_access(){
 # test of encoding and A4 layout       #
 ########################################
 
+cd ../src/
+
 if [ -d "dummy" ]
 then
     echo "dir dummy for tests already exists; cleaning!"
