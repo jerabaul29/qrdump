@@ -12,7 +12,5 @@ set -o nounset
 for CRRT_TEST in $(ls test_*\.sh) ; do
     echo "--------------------------------------------------"
     echo "running test $CRRT_TEST"
-
     bash $CRRT_TEST
-
 done

@@ -17,7 +17,7 @@ echo ${DIGEST_IN}
 bash ./qrdump.sh --create-A4 --base64 --safe-mode --output ./dummy/generated_pdf/my_pdf.pdf ./dummy/dummy_file.dat
 
 echo "the pdf has been generated"
-sleep 10
+sync
 press_any
 
 bash ./qrdump.sh --recover --base64 --output ./dummy/restored_result/ ./dummy/generated_pdf/my_pdf.pdf

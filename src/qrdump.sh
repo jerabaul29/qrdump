@@ -948,7 +948,7 @@ assemble_into_A4(){
     echo_verbose "created working tmp: ${TMP_DIR}"
     cp -r ${FOLDER_NAME}/* ${TMP_DIR}/.
     echo "give time to copy otherwise decoding will fail"
-    sleep 10
+    sync
 
     local GENERAL_FOLDER_NAME=${FOLDER_NAME}
     FOLDER_NAME=${TMP_DIR}
@@ -1040,7 +1040,7 @@ assemble_into_A4(){
     # put all the pages together
     img2pdf --colorspace L --pagesize A4 -o ${FOLDER_NAME}/full_layout_QR_dump.pdf ${FOLDER_NAME}/first_page_full.png ${FOLDER_NAME}/data_page_*.png &> /dev/null
 
-    sleep 1
+    sync
 
     cp ${FOLDER_NAME}/full_layout_QR_dump.pdf ${OUTPUT}
     FOLDER_NAME=${GENERAL_FOLDER_NAME}
@@ -1059,7 +1059,7 @@ read_pdf_A4(){
     echo_verbose "created working tmp: ${TMP_DIR}"
     cp -r ${BASE_FOLDER}/* ${TMP_DIR}/.
     echo "give time to copy otherwise decoding will fail"
-    sleep 10
+    sync
 
     local GENERAL_FOLDER_NAME=${BASE_FOLDER}
     BASE_FOLDER=${TMP_DIR}
@@ -1130,7 +1130,7 @@ full_decode(){
     echo_verbose "created working tmp: ${TMP_DIR}"
     cp -r ${FOLDER_NAME}/* ${TMP_DIR}/.
     echo "give time to copy otherwise decoding will fail"
-    sleep 10
+    sync
 
     local GENERAL_FOLDER_NAME=${FOLDER_NAME}
     FOLDER_NAME=${TMP_DIR}

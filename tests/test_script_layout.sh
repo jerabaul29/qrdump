@@ -21,8 +21,7 @@ echo ${DIGEST_IN}
 
 echo "encoding finished"
 
-echo "WAIT SO THAT FILES ARE FULLY COPIED, OTHERWISE ERROR"
-sleep 10
+sync
 
 # generate the A4 dump
 bash ./qrdump.sh --layout --base64 -b -v --output ./dummy/generated_pdf/my_pdf.pdf ./dummy/qr_codes
