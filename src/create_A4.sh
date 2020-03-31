@@ -178,8 +178,8 @@ int_with_2_digits(){
 }
 
 assemble_into_A4(){
-    INPUT=$1
-    OUTPUT=$2
+    local INPUT=$1
+    local OUTPUT=$2
 
     local TMP_DIR=$(mktemp -d)
     cp -r ${INPUT}/* ${TMP_DIR}/.

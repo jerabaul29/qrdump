@@ -113,6 +113,22 @@ assert_avail_file(){
     fi
 }
 
+assert_identical(){
+    local FILE_1=$1
+    local FILE_2=$2
+
+    local DIGEST_1=$(sha512sum $1 | awk '{print $1;}')
+    local DIGEST_2=$(sha512sum $2 | awk '{print $1;}')
+
+    if [[ "${DIGEST_1}" = "${DIGEST_2}" ]]
+    then
+        echo "SAFE to use: success restoring check"
+    else
+        echo "UNSAFE to use: error restoring, non identical file!"
+        exit 1
+    fi
+}
+
 # digest_function(){
 #     if [[ "$#" = "1" ]]
 #     then

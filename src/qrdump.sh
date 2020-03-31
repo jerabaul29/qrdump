@@ -123,6 +123,20 @@ then
     exit 1
 fi
 
+# safe mode is only offered to pdf for now
+if [[ "$SAFE_MODE" = "True" ]]; then
+    if [[ ! "$ACTION" = "CreateA4" ]]; then
+        echo "for now safe mode is only possible with --create-A4"
+        exit 1
+    fi
+fi
+
+# only support files as input; the user should zip himself if want to use on folder
+if [ ! -f $INPUT ]; then
+    echo "a file is needed as input"
+    exit 1
+fi
+
 ##############################################
 # call the right command                     #
 ##############################################
@@ -180,6 +194,17 @@ case "$ACTION" in
         full_encode $INPUT $WORKING_DIR
         assemble_into_A4 $WORKING_DIR $OUTPUT
         rm -rf WORKING_DIR
+        if [[ "$SAFE_MODE" = "True" ]]; then
+            echo_verbose "checking that safe to extract"
+            TMP_OUT=$(mktemp -d)/
+            WORKING_DIR_2=$(mktemp -d)
+            extract_all_QR_codes $OUTPUT $WORKING_DIR_2
+            full_decode $WORKING_DIR_2 $TMP_OUT
+            assert_identical $TMP_OUT/$(basename $INPUT) $INPUT
+            rm -rf $WORKING_DIR_2
+            rm -rf TMP_OUT
+        fi
+        rm -rf $WORKING_DIR
         ;;
     ReadA4)
         echo_verbose "execute read pdf"
@@ -190,5 +215,6 @@ case "$ACTION" in
         WORKING_DIR=$(mktemp -d)
         extract_all_QR_codes $INPUT $WORKING_DIR
         full_decode $WORKING_DIR $OUTPUT
+        rm -rf $WORKING_DIR
         ;;
 esac
