@@ -19,7 +19,7 @@ DIGEST_OUT=$(sha512sum dummy/restored_result/dummy_file.dat | awk '{print $1;}')
 
 if [[ "${DIGEST_IN}" = "${DIGEST_OUT}" ]]
 then
-    echo "success restoring!"
+    echo "RES success restoring"
 else
     echo "non identical file!"
     exit 1
