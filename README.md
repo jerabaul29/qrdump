@@ -47,6 +47,8 @@ alias qrdump='bash ~/Desktop/Git/qrdump/src/qrdump.sh'
 
 Execute ```/tests/run_all_tests.sh``` to run all tests.
 
+All tests passing on Ubuntu 18.04 with relevant pacakges installed.
+
 # Notes
 
 :warning: :construction: **this is a very recent tool still under construction; consider waiting a bit before starting to use the code here for production; contributions / feedback / code reviews welcome though** :construction: :warning:
