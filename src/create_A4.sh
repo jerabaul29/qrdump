@@ -2,6 +2,7 @@
 
 source ./boilerplate.sh
 source ./qrdump_params.sh --no-print
+source ./tools.sh
 
 pad_png_image(){
     # $1 path to the png
@@ -169,18 +170,6 @@ create_page_of_qr_banners(){
 
         create_page_of_qr_banners ${NEXT_PAGE_NUMBER} ${FOLDER_NAME} ${NEXT_LIST_DATA_BANNER}
     fi
-}
-
-int_with_5_digits(){
-    local padded=$1
-    local cleaned=${padded##+(0)}
-    printf "%05d\n" $(( 10#$cleaned ))
-}
-
-int_with_2_digits(){
-    local padded=$1
-    local cleaned=${padded##+(0)}
-    printf "%02d\n" $cleaned
 }
 
 assemble_into_A4(){

@@ -180,7 +180,7 @@ perform_qr_encoding(){
 
     if [[ "${ENCODING}" = "base64"  ]]
     then
-        base64 < ${FILE_TO_ENCODE} | qrencode -l M -8 -o ${DESTINATION}.png
+        base64 -w 0 < ${FILE_TO_ENCODE} | qrencode -l M -8 -o ${DESTINATION}.png
     fi
 }
 
@@ -190,7 +190,7 @@ perform_qr_decoding(){
 
     if [[ "${ENCODING}" = "base64"  ]]
     then
-        zbarimg --raw --quiet "${TO_DECODE}" | base64 -d > "${DESTINATION}"
+        zbarimg --raw --quiet "${TO_DECODE}" | base64 -di > "${DESTINATION}"
     fi
 }
 
@@ -203,5 +203,17 @@ n_last_bytes(){
     show_debug_variable "NBYTES_TO_CUT"
 
     dd if="$2" of="$3" ibs="${NBYTES_TO_CUT}" skip=1 status=none
+}
+
+int_with_5_digits(){
+    local padded=$1
+    local cleaned=${padded##+(0)}
+    printf "%05d\n" $(( 10#$cleaned ))
+}
+
+int_with_2_digits(){
+    local padded=$1
+    local cleaned=${padded##+(0)}
+    printf "%02d\n" $cleaned
 }
 

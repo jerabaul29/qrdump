@@ -1,5 +1,6 @@
 source ./boilerplate.sh
 source ./qrdump_params.sh --no-print
+source ./tools.sh
 
 extract_QR_codes_from_pages(){
     local BASE_FOLDER=$1
@@ -12,21 +13,21 @@ extract_QR_codes_from_pages(){
         show_debug_variable "CRRT_PAGE"
 
         # first banner
-        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
+        convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
+        convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
         # second banner
-        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
+        convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
+        convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
 
         # third banner
-        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
+        convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
-        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/data-$(int_with_2_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
+        convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
         CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
     done
 }

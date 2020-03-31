@@ -6,7 +6,7 @@ source ./qrdump_params.sh --no-print
 
 full_decode(){
     echo_verbose "----------------------------------------"
-    echo_verbose "entering function full_encode"
+    echo_verbose "entering function full_decode"
 
     local INPUT=$1
     local OUTPUT=$2
@@ -21,14 +21,18 @@ full_decode(){
     local TO_DECODE="${TMP_DIR}/metadata.png"
     local DESTINATION="${TMP_DIR}/metadata.dat"
 
+    echo_verbose "decode metadata png"
     perform_qr_decoding ${TO_DECODE} ${DESTINATION}
 
     # decode all segments
     for CRRT_QR_CODE in ${TMP_DIR}/data-*.png
     do
+        echo_verbose "decode $CRRT_QR_CODE"
         local CRRT_DESTINATION="${CRRT_QR_CODE%.*}.dat"
         perform_qr_decoding "${CRRT_QR_CODE}" "${CRRT_DESTINATION}"
     done
+
+    echo_verbose "done reading all"
 
     # read the metadata
     # TODO: move to a function
