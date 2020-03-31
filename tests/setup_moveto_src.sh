@@ -21,8 +21,6 @@ GIVE_ACCESS=false
 # helper functions                     #
 ########################################
 
-# TODO: allow to redirect tests to a log file
-
 press_any(){
 	if [ $GIVE_ACCESS = true ]
 	then
@@ -52,3 +50,5 @@ then
 fi
 
 mkdir dummy
+
+head -c 4096 </dev/urandom > ./dummy/dummy_file.dat

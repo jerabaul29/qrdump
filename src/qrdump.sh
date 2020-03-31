@@ -132,9 +132,11 @@ if [[ "$SAFE_MODE" = "True" ]]; then
 fi
 
 # only support files as input; the user should zip himself if want to use on folder
-if [ ! -f $INPUT ]; then
-    echo "a file is needed as input"
-    exit 1
+if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
+    if [ ! -f $INPUT ]; then
+        echo "a file is needed as input"
+        exit 1
+    fi
 fi
 
 ##############################################
