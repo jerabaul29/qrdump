@@ -1,51 +1,36 @@
 #/bin/bash
 
-source ./boilerplate.sh
+source ./setup_moveto_src.sh
 
-mkdir qr_codes
-mkdir decoded
-mkdir generated_pdf
-mkdir extracted_A4_qr_codes
+mkdir dummy/qr_codes
+mkdir dummy/decoded
+mkdir dummy/generated_pdf
+mkdir dummy/extracted_A4_qr_codes
 
 give_access
 
-head -c 4096 </dev/urandom > dummy_file.dat
-
-cd ..
+head -c 4096 </dev/urandom > dummy/dummy_file.dat
 
 DIGEST_IN=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
-echo "digest of the random file:"
-echo ${DIGEST_IN}
 
-./qrdump.sh --base64 -b --encode -v --output ./dummy/qr_codes ./dummy/dummy_file.dat
+./qrdump.sh --base64 --encode --output ./dummy/qr_codes --input ./dummy/dummy_file.dat
 
-echo "encoding finished"
+./qrdump.sh --layout --base64 --output ./dummy/generated_pdf/my_pdf.pdf --input ./dummy/qr_codes
 
-sync
+./qrdump.sh --extract --base64 --output ./dummy/extracted_A4_qr_codes --input dummy/generated_pdf/my_pdf.pdf
 
-# generate the A4 dump
-bash ./qrdump.sh --layout --base64 -b -v --output ./dummy/generated_pdf/my_pdf.pdf ./dummy/qr_codes
-
-# extract QR codes from the A4
-bash ./qrdump.sh --read-pdf --base64 -b -v --output ./dummy/extracted_A4_qr_codes dummy/generated_pdf/my_pdf.pdf
-
-# decode
-bash ./qrdump.sh --base64 -b -d -v --output dummy/decoded dummy/extracted_A4_qr_codes
+./qrdump.sh --base64 --decode --output dummy/decoded --input dummy/extracted_A4_qr_codes
 
 DIGEST_OUT=$(sha512sum dummy/decoded/dummy_file.dat | awk '{print $1;}')
-echo "digest of the decrypted file:"
-echo ${DIGEST_OUT}
 
 if [[ "${DIGEST_IN}" = "${DIGEST_OUT}" ]]
 then
-    echo "success restoring!"
+    echo "RES success restoring"
 else
-    echo "non identical file!"
+    echo "RES non identical file"
     exit 1
 fi
 
 press_any
 
-rm -rf dummy
-
-cd ../tests/
+source ../tests/rigup_moveto_test.sh

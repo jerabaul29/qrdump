@@ -1,0 +1,4 @@
+- put back the digest and make sure ok with any binary bytes (use non bin digest?)
+- take away as many cp operations as possible to speed up
+- make sure the tmps are removed
+- full encode and full decode: allow to not use tmp but the current folder with an option

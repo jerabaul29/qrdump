@@ -1,51 +1,30 @@
 #/bin/bash
 
-# a small set of tests of the qrdump tools
-# TODO: move to its own folder
-# TODO: automate testing
-# TODO: increase coverage
-# TODO: use fully extended options for lisibility
+source ./setup_moveto_src.sh
 
-source ./boilerplate.sh
-
-mkdir qr_codes
-mkdir decoded
+mkdir ./dummy/qr_codes
+mkdir ./dummy/decoded
 
 give_access
 
-head -c 4096 </dev/urandom > dummy_file.dat
-
-cd ..
+head -c 4096 </dev/urandom > ./dummy/dummy_file.dat
 
 DIGEST_IN=$(sha512sum dummy/dummy_file.dat | awk '{print $1;}')
-echo "digest of the random file:"
-echo ${DIGEST_IN}
 
-./qrdump.sh --base64 -b --encode -v --output ./dummy/qr_codes dummy/dummy_file.dat
+./qrdump.sh --base64 --encode --output ./dummy/qr_codes --input dummy/dummy_file.dat
 
-echo "encoding finished"
-sync
+./qrdump.sh --base64 --decode --output ./dummy/decoded/ --input dummy/qr_codes/
 
-press_any
-
-bash ./qrdump.sh --base64 -b --decode -v --output ./dummy/decoded/ dummy/qr_codes/
-
-echo "decoding finished"
-press_any
 DIGEST_OUT=$(sha512sum dummy/decoded/dummy_file.dat | awk '{print $1;}')
-echo "digest of the decrypted file:"
-echo ${DIGEST_OUT}
 
 if [[ "${DIGEST_IN}" = "${DIGEST_OUT}" ]]
 then
-    echo "success restoring!"
+    echo "RES success restoring"
 else
-    echo "non identical file!"
+    echo "RES non identical file"
     exit 1
 fi
 
-# TODO: take sha of decoded and check integrity
+press_any
 
-rm -rf dummy
-
-cd ../tests/
+source ../tests/rigup_moveto_test.sh

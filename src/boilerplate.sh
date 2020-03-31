@@ -1,6 +1,6 @@
-#!/bin/bash
-
-# TODO: make it possible to run in a verbose way
+##############################################
+# sounder programming environment            #
+##############################################
 
 # exit if a command fails
 set -o errexit
@@ -10,9 +10,3 @@ set -o pipefail
 set -o noclobber
 # exit if try to use undefined variable
 set -o nounset
-
-for CRRT_TEST in $(ls test_*\.sh) ; do
-    echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-    echo "running test $CRRT_TEST"
-    bash $CRRT_TEST
-done

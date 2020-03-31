@@ -52,4 +52,3 @@ then
 fi
 
 mkdir dummy
-cd dummy
