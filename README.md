@@ -51,5 +51,18 @@ All tests passing on Ubuntu 18.04 with relevant pacakges installed.
 
 # Notes
 
+- This works for quite large files. The following example shows that dumping and restoring a 100K file is fine. Takes around half a minute on my machine. The pdf is just 55 pages long.
+
+```
+bash-4.4$ head -c 100k </dev/urandom > dummy.dat
+bash-4.4$ ls -lh
+total 100K
+-rw-r--r-- 1 jrlab jrlab 100K mars  31 17:58 dummy.dat
+bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat
+SAFE to use: success restoring check
+```
+
+- The repo is under construction still:
+
 :warning: :construction: **this is a very recent tool still under construction; consider waiting a bit before starting to use the code here for production; contributions / feedback / code reviews welcome though** :construction: :warning:
 
