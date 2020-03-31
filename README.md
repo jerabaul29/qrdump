@@ -10,26 +10,32 @@ The aim of this repository is to provide a default-solution for dumping data int
 
 The package is a set of bash scripts and functions to make it easy to:
 
-- dump data as a set of several QR-format, with extensive meta-data
-- layout the QR-codes on a standard A4 pages in a standardised way
-- recover the QR-codes and put their contents automatically together to re-create the initial data.
+- dump data as a set of several QR-codes, with extensive meta-data, and layout as a printable pdf
+- recover the QR-codes from dump pdf, and assemble them together to re-create the initial data.
 
 # use
 
-See the *src/test_script_XX.sh* examples for details.
-
-Quick example data file to A4 pdf and back: qrdump.sh has been copied locally to do this test):
+Quick example data file to A4 pdf and back:
 
 ```
-✔ jrlab-ThinkPad-T490:~/Desktop/Git/qrdump/src> head -c 4096 </dev/urandom > dummy.dat
-✔-1 jrlab-ThinkPad-T490:~/Desktop/Git/qrdump/src> ./qrdump.sh --create-A4 --base64 --output ./pdf_dump.pdf --input dummy.dat 
-✔-127 jrlab-ThinkPad-T490:~/Desktop/Git/qrdump/src> sha1sum dummy.dat 
-58428a3b55a3f3067a2804aff4728f6f9d29b1ba  dummy.dat
-✔ jrlab-ThinkPad-T490:~/Desktop/Git/qrdump/src> rm dummy.dat 
-✔ jrlab-ThinkPad-T490:~/Desktop/Git/qrdump/src> ./qrdump.sh --base64 --read-A4 --input pdf_dump.pdf --output ./
-✔ jrlab-ThinkPad-T490:~/Desktop/Git/qrdump/src> sha1sum dummy.dat 
-58428a3b55a3f3067a2804aff4728f6f9d29b1ba  dummy.dat
+bash-4.4$ FOLDER_TESTS=$(mktemp -d)
+bash-4.4$ cd $FOLDER_TESTS/
+bash-4.4$ head -c 4096 </dev/urandom > dummy.dat
+bash-4.4$ sha256sum dummy.dat 
+02f2c6dd472f43e9187043271257c1bf87a2f43b771d843e45b201892d9e7b84  dummy.dat
+bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat
+SAFE to use: success restoring check
+bash-4.4$ rm dummy.dat 
+bash-4.4$ ls
+pdf_dump.pdf
+bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --base64 --read-A4 --input pdf_dump.pdf --output ./
+bash-4.4$ sha256sum dummy.dat 
+02f2c6dd472f43e9187043271257c1bf87a2f43b771d843e45b201892d9e7b84  dummy.dat
 ```
+
+The pdf_dump.pdf is easily printable (and then scannable). For example, the pdf output (shown fully with pages side-by-side) for 4096 bytes look like:
+
+![Illustration of pdf output (here dump of 4096 bytes)](./doc/Illustration_pdf_dump/Illustration.png?raw=true)
 
 # status
 
