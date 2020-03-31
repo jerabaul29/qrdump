@@ -50,7 +50,7 @@ while true; do
         -a|--base64)
             ENCODING="base64"; shift;;
         -b|--debug)
-            DEBUG="True"; VERBOSE=True; shift;;
+            DEBUG="True"; VERBOSE="True"; shift;;
         -g|--digest)
             DIGEST="$2"; shift 2;;
         -e|--encode)

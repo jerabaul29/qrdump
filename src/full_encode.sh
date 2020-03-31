@@ -48,7 +48,7 @@ full_encode(){
     done
 
     # generate the qr code with the metadata
-    echo_verbose "create meteadata"
+    echo_verbose "create metadata"
 
     local CRRT_FILE=${TMP_DIR}/metadata
     echo -n "QRD:" >> ${CRRT_FILE}
@@ -86,6 +86,7 @@ full_encode(){
         CRRT_DESTINATION="$(basename ${CRRT_QR_CODE})"
         echo_verbose "move ${CRRT_QR_CODE} to ${CRRT_DESTINATION}"
         cp ${CRRT_QR_CODE} ${OUTPUT}/${CRRT_DESTINATION}
+        sync
     done
 
     # delete temporary folder

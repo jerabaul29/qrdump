@@ -101,5 +101,6 @@ full_decode(){
     echo_verbose "success with gunzip"
 
     cp ${OUTPUT_FILE} ${OUTPUT}
+    sync
     rm -rf ${TMP_DIR}
 }
