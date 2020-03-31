@@ -35,7 +35,7 @@ bash-4.4$ sha256sum dummy.dat
 
 The pdf_dump.pdf is easily printable (and then scannable). For example, the pdf output (shown fully with pages side-by-side) for 4096 bytes look like:
 
-![Illustration of pdf output (here dump of 4096 bytes)](./doc/Illustration_pdf_dump/Illustration.png?raw=true)
+![Illustration of pdf output (here dump of 4096 bytes)](doc/illustration_pdf_dump/illustration.png?raw=true)
 
 # status
 
