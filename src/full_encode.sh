@@ -25,7 +25,7 @@ full_encode(){
 
     # split the compressed file
     # into segments to be used for qr-codes.
-    split -d -a 2 -b ${QRDUMP_CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
+    split -d -a 6 -b ${QRDUMP_CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
 
     local NBR_DATA_SEGMENTS=$(find ${TMP_DIR} -name 'data-*' | wc -l)
     echo_verbose "split into ${NBR_DATA_SEGMENTS} segments"
@@ -35,7 +35,7 @@ full_encode(){
     # NOTE: took away using the digest; consider re-introducing but then CAREFUL of null bytes...
     local COUNTER=0
 
-    for CRRT_FILE in ${TMP_DIR}/data-??; do
+    for CRRT_FILE in ${TMP_DIR}/data-*; do
         echo -n "${ID}" >> ${CRRT_FILE}
 
         printf "0: %.4x" $COUNTER | xxd -r -g0 >> ${CRRT_FILE}
@@ -43,7 +43,7 @@ full_encode(){
     done
 
     # generate the data segments qr codes
-    for CRRT_FILE in ${TMP_DIR}/data-??; do
+    for CRRT_FILE in ${TMP_DIR}/data-*; do
         perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"
     done
 

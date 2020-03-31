@@ -53,7 +53,7 @@ extract_all_QR_codes(){
     # clean over numerous empty QR codes
     echo_verbose "testing for empty restored qr codes"
 
-    for CRRT_QR_CODE in ${OUTPUT}/data-??.png
+    for CRRT_QR_CODE in ${OUTPUT}/data-*.png
     do
         local IS_EMPTY=$(identify -format "%[fx:(mean==1)?1:0]" ${CRRT_QR_CODE})
 

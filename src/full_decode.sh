@@ -24,7 +24,7 @@ full_decode(){
     perform_qr_decoding ${TO_DECODE} ${DESTINATION}
 
     # decode all segments
-    for CRRT_QR_CODE in ${TMP_DIR}/data-??.png
+    for CRRT_QR_CODE in ${TMP_DIR}/data-*.png
     do
         local CRRT_DESTINATION="${CRRT_QR_CODE%.*}.dat"
         perform_qr_decoding "${CRRT_QR_CODE}" "${CRRT_DESTINATION}"
@@ -56,7 +56,7 @@ full_decode(){
 
     # TODO: use the metadata to check consistency, digests, etc
     # TODO: have a digest of the whole file
-    for CRRT_DATA in ${TMP_DIR}/data-??.dat
+    for CRRT_DATA in ${TMP_DIR}/data-*\.dat
     do
         # the data part
         cat ${CRRT_DATA} >> ${ASSEMBLED_COMPRESSED}

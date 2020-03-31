@@ -61,6 +61,7 @@ create_banner_of_qr_codes(){
     fi
 
     local BANNER_NUMBER=$1
+    local BANNER_NUMBER_REPR=$(int_with_5_digits $BANNER_NUMBER )
     local FOLDER_NAME=$2
 
     local FIRST_DATA_TO_USE=$3
@@ -78,7 +79,7 @@ create_banner_of_qr_codes(){
     convert -size 23x269 xc:white ${FOLDER_NAME}/padding_banner_sides.png
     convert -size 11x269 xc:white ${FOLDER_NAME}/padding_banner_middle.png
 
-    convert ${FOLDER_NAME}/padding_banner_sides.png ${FIRST_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_middle.png ${SECOND_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_sides.png +append ${FOLDER_NAME}/banner_${BANNER_NUMBER}.png
+    convert ${FOLDER_NAME}/padding_banner_sides.png ${FIRST_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_middle.png ${SECOND_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_sides.png +append ${FOLDER_NAME}/banner_${BANNER_NUMBER_REPR}.png
 
     # if some data qr codes left, generate more banners
     if [ "$#" -gt 4 ]
@@ -110,6 +111,7 @@ create_page_of_qr_banners(){
     fi
 
     local PAGE_NUMBER=$1
+    local PAGE_NUMBER_REPR=$(int_with_5_digits $PAGE_NUMBER)
     local FOLDER_NAME=$2
 
     local FIRST_DATA_TO_USE=$3
@@ -135,7 +137,7 @@ create_page_of_qr_banners(){
 
     echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_top.txt
     # TODO: put some relevant metadata
-    echo "PAGE ${PAGE_NUMBER}; some relevant metadata" >> ${FOLDER_NAME}/text_top.txt
+    echo "PAGE ${PAGE_NUMBER_REPR}; some relevant metadata" >> ${FOLDER_NAME}/text_top.txt
     echo -n "\"" >> ${FOLDER_NAME}/text_top.txt
 
     convert -size 595x32 xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_top.txt ${FOLDER_NAME}/padding_page_top.png
@@ -153,7 +155,7 @@ create_page_of_qr_banners(){
         ${THIRD_DATA_TO_USE} \
         ${FOLDER_NAME}/padding_page_bottom.png \
         -append \
-        ${FOLDER_NAME}/data_page_${PAGE_NUMBER}.png
+        ${FOLDER_NAME}/data_page_${PAGE_NUMBER_REPR}.png
 
     # if some banners left, generate more banners
     if [ "$#" -gt 5 ]
@@ -170,11 +172,15 @@ create_page_of_qr_banners(){
 }
 
 int_with_5_digits(){
-    printf "%05d\n" $1
+    local padded=$1
+    local cleaned=${padded##+(0)}
+    printf "%05d\n" $(( 10#$cleaned ))
 }
 
 int_with_2_digits(){
-    printf "%02d\n" $1
+    local padded=$1
+    local cleaned=${padded##+(0)}
+    printf "%02d\n" $cleaned
 }
 
 assemble_into_A4(){
@@ -233,13 +239,13 @@ assemble_into_A4(){
     # TODO: make it adaptive; currently it is hard coded following the choice of bytes per qr-code
 
     # pad to a slightly larger size; this is hard coded, consider to fix?
-    for CRRT_FILE in ${TMP_DIR}/data-??.png; do
+    for CRRT_FILE in ${TMP_DIR}/data-*\.png; do
         local BASE_NAME=$(basename ${CRRT_FILE})
         pad_png_image ${CRRT_FILE} 269 269 ${TMP_DIR}/padded_${BASE_NAME}
     done
 
     # glue together 2 and 2 images to create a banner
-    local LIST_PADDED_QR_DATA=$(ls ${TMP_DIR}/padded_data-??.png | tr '\r\n' ' ')
+    local LIST_PADDED_QR_DATA=$(ls ${TMP_DIR}/padded_data-*\.png | tr '\r\n' ' ')
     create_banner_of_qr_codes 1 ${TMP_DIR} ${LIST_PADDED_QR_DATA}
 
     # glue together banners to create pages
