@@ -37,6 +37,7 @@ The pdf_dump.pdf is easily printable (and then scannable back in many years). A 
 
 - clone the repo
 - use the ```/src/qrdump script``` as shown in the example
+- install the packages necessary (TODO: requirements; for now, your bash will complain when commands are not available)
 - for easy use, consider setting up a bashrc alias:
 
 ```
