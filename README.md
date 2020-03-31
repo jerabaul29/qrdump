@@ -40,7 +40,7 @@ The pdf_dump.pdf is easily printable (and then scannable). A bit of metadata (pa
 # Installation
 
 - clone the repo
-- use the /src/qrdump script as shown in the example
+- use the ```/src/qrdump script``` as shown in the example
 - for easy use, consider setting up a bash alias:
 
 ```
