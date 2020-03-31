@@ -2,6 +2,9 @@
 
 CWD="$(pwd)/"
 
+QRDUMP_SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+cd $QRDUMP_SCRIPTPATH
+
 ##############################################
 # parse incoming args                        #
 ##############################################
@@ -75,6 +78,8 @@ while true; do
     esac
 done
 
+INPUT="${CWD}${INPUT}"
+OUTPUT="${CWD}${OUTPUT}"
 
 ##############################################
 # now ready to import functions etc          #
@@ -134,6 +139,7 @@ fi
 # only support files as input; the user should zip himself if want to use on folder
 if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
     if [ ! -f $INPUT ]; then
+        echo "using INPUT: $INPUT"
         echo "a file is needed as input"
         exit 1
     fi
@@ -147,9 +153,6 @@ if [ "$HELP" = "True" ]; then
     echo "TODO help"
     exit 0
 fi
-
-INPUT="${CWD}${INPUT}"
-OUTPUT="${CWD}${OUTPUT}"
 
 case "$ACTION" in
     None)
@@ -220,3 +223,5 @@ case "$ACTION" in
         rm -rf $WORKING_DIR
         ;;
 esac
+
+cd $CWD
