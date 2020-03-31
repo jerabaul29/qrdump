@@ -78,6 +78,11 @@ while true; do
     esac
 done
 
+if [ "$HELP" = "True" ]; then
+    echo "TODO help"
+    exit 0
+fi
+
 INPUT="${CWD}${INPUT}"
 OUTPUT="${CWD}${OUTPUT}"
 
@@ -148,11 +153,6 @@ fi
 ##############################################
 # call the right command                     #
 ##############################################
-
-if [ "$HELP" = "True" ]; then
-    echo "TODO help"
-    exit 0
-fi
 
 case "$ACTION" in
     None)
