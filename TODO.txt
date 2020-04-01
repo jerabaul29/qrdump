@@ -1,0 +1,18 @@
+- check for local vs absolute paths
+
+- tests; add a closing green / red message
+- have a 'quick check' option run run_tests
+- add test coverage no arg
+- add test coverage help
+- automate tests before push
+
+- copy optimizations
+- speedups where possible, make sure all rms are done
+- --in-place option to not use a TMP
+
+- use metadata actively
+- make it easy to set metadata from command line
+
+- autocomplete
+
+- requirements: check version numbers higher than
