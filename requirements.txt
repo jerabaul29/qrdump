@@ -1,1 +1,11 @@
-zbar-tools
+#qrencode: qrencode
+#base64: coreutils
+#zbarimg: install zbar-tools
+#gzip: gzip
+#gunzip: gzip
+#split: coreutils
+#dd: coreutils
+#truncate: coreutils
+#convert: imagemagick
+#img2pdf: img2pdf
+#zbar-tools: zbar-tools

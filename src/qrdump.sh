@@ -6,6 +6,12 @@ QRDUMP_SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $QRDUMP_SCRIPTPATH
 
 ##############################################
+# check needed packages                      #
+##############################################
+
+source ./check_dependencies.sh
+
+##############################################
 # parse incoming args                        #
 ##############################################
 
@@ -77,6 +83,11 @@ while true; do
             echo "Invalid args; type -h or --help for help"; exit 3;;
     esac
 done
+
+if [ $# -eq 0 ]; then
+    echo "no argument, displaying help..."
+    HELP="True"
+fi
 
 if [ "$HELP" = "True" ]; then
     echo "TODO help"
