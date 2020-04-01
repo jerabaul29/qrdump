@@ -39,6 +39,11 @@ INPUT="None"
 OUTPUT="None"
 SAFE_MODE="None"
 
+if [ $# -eq 0 ]; then
+    echo "no argument, displaying help..."
+    HELP="True"
+fi
+
 ! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     exit 2
@@ -83,11 +88,6 @@ while true; do
             echo "Invalid args; type -h or --help for help"; exit 3;;
     esac
 done
-
-if [ $# -eq 0 ]; then
-    echo "no argument, displaying help..."
-    HELP="True"
-fi
 
 if [ "$HELP" = "True" ]; then
     echo "TODO help"
