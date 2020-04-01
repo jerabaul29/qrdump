@@ -37,7 +37,22 @@ The pdf_dump.pdf is easily printable (and then scannable back in many years). A 
 
 - clone the repo
 - use the ```/src/qrdump script``` as shown in the example
-- install the packages necessary (TODO: requirements; for now, your bash will complain when commands are not available)
+- install the packages necessary (TODO: requirements; for now, your bash will complain when commands are not available). These should be in format command: package (note: requirements is work under progress, list may not be exhaustive, open issues if stuff not working)
+
+```
+qrencode: qrencode
+base64: coreutils
+zbarimg: install zbar-tools
+gzip: gzip
+gunzip: gzip
+split: coreutils
+dd: coreutils
+truncate: coreutils
+convert: imagemagick
+img2pdf: img2pdf
+zbar-tools: zbar-tools
+```
+
 - for easy use, consider setting up a bashrc alias:
 
 ```
