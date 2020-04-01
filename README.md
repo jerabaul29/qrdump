@@ -50,7 +50,6 @@ dd: coreutils
 truncate: coreutils
 convert: imagemagick
 img2pdf: img2pdf
-zbar-tools: zbar-tools
 ```
 
 - for easy use, consider setting up a bashrc alias:

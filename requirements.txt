@@ -1,11 +1,15 @@
-#qrencode: qrencode
-#base64: coreutils
-#zbarimg: install zbar-tools
-#gzip: gzip
-#gunzip: gzip
-#split: coreutils
-#dd: coreutils
-#truncate: coreutils
-#convert: imagemagick
-#img2pdf: img2pdf
-#zbar-tools: zbar-tools
+# TOOD: automate at install, make in right format, check version numbers
+
+# The necessary dependencies, in format:
+# command: package
+
+# qrencode: qrencode
+# base64: coreutils
+# zbarimg: install zbar-tools
+# gzip: gzip
+# gunzip: gzip
+# split: coreutils
+# dd: coreutils
+# truncate: coreutils
+# convert: imagemagick
+# img2pdf: img2pdf
