@@ -1,8 +1,6 @@
 - check all vars are "", to avoid the explicit split and glob
 - use shellcheck to see if things can be improved
 
-- add the final test for paths: the ~ paths test
-
 - add test coverage no arg
 - add test coverage help
 - automate tests before push
@@ -19,3 +17,7 @@
 - requirements: check version numbers higher than
 
 - provide container barebone to run
+
+- have a --version command
+
+- when v1 release, include a pdf to restore to always check backwards compatibility
