@@ -36,7 +36,9 @@ The pdf_dump.pdf is easily printable (and then scannable back in many years). A 
 # Installation
 
 - clone the repo
+
 - use the ```/src/qrdump script``` as shown in the example
+
 - install the packages necessary (TODO: requirements; for now, your bash will complain when commands are not available). These should be in format command: package (note: requirements is work under progress, list may not be exhaustive, open issues if stuff not working)
 
 ```
@@ -52,9 +54,12 @@ convert: imagemagick
 img2pdf: img2pdf
 ```
 
-- for easy use, consider setting up a bashrc alias:
+- for autocomplete, source ```completion/qrdump_completion.sh```
+
+- for easy use, consider setting up a bashrc sourcing and alias (adapt the path to the package, this is for my machine where it is cloned on ~Desktop/Git/qrdump/):
 
 ```
+source ~/Desktop/Git/qrdump/completion/qrdump_completion.sh
 alias qrdump='bash ~/Desktop/Git/qrdump/src/qrdump.sh'
 ```
 
