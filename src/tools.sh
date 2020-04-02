@@ -4,7 +4,25 @@
 # verbose and debug functions                #
 ##############################################
 
-GIVE_ACCESS=true
+GIVE_ACCESS=false
+
+expand_full_relative_path(){
+    local CRRT_CWD="$1"
+    local CRRT_PATH="$2"
+
+    case $CRRT_PATH in
+        /*)
+            echo "$CRRT_PATH"
+            ;;
+        ~*)
+            local CRRT_HOME="$(echo ~)"
+            echo "${CRRT_HOME}/${CRRT_PATH}"
+            ;;
+        *)
+            echo "${CRRT_CWD}/${CRRT_PATH}"
+            ;;
+    esac
+}
 
 press_any(){
 	if [ $GIVE_ACCESS = true ]

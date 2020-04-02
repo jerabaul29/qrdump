@@ -94,9 +94,6 @@ if [ "$HELP" = "True" ]; then
     exit 0
 fi
 
-INPUT="${CWD}${INPUT}"
-OUTPUT="${CWD}${OUTPUT}"
-
 ##############################################
 # now ready to import functions etc          #
 ##############################################
@@ -110,6 +107,8 @@ source ./full_decode.sh
 source ./create_A4.sh
 source ./ReadA4.sh
 
+INPUT=$(expand_full_relative_path "${CWD}" "${INPUT}")
+OUTPUT=$(expand_full_relative_path "${CWD}" "${OUTPUT}")
 
 ##############################################
 # in case of debug, show the options         #

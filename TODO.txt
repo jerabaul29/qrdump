@@ -1,7 +1,8 @@
-- check for local vs absolute paths
+- check all vars are "", to avoid the explicit split and glob
+- use shellcheck to see if things can be improved
 
-- tests; add a closing green / red message
-- have a 'quick check' option run run_tests
+- add the final test for paths: the ~ paths test
+
 - add test coverage no arg
 - add test coverage help
 - automate tests before push
@@ -16,3 +17,5 @@
 - autocomplete
 
 - requirements: check version numbers higher than
+
+- provide container barebone to run
