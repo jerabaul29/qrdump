@@ -12,12 +12,19 @@
 - use metadata actively
 - make it easy to set metadata from command line
 
-- autocomplete
-
 - requirements: check version numbers higher than
+- requirements: use a hashmap to get both command and which package it belongs to
 
 - provide container barebone to run
 
-- have a --version command
+- when v1 release, include a pdf to restore test to always check backwards compatibility
 
-- when v1 release, include a pdf to restore to always check backwards compatibility
+- add red lines on the pdf for separtion of QR-codes
+
+- automate tests at push / daily
+
+- create a qrdump --enhance-pdf command to:
+-- find red lines
+-- use it as a referential
+-- generate a new, well-formatted pdf
+- note: this should be in C++

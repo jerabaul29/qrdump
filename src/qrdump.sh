@@ -25,7 +25,7 @@ fi
 
 # acceptable options
 OPTIONS=hvabg:edro:csi:lt
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version
 
 # default values of the options
 # TODO: follow QRDUMP_ naming convention for global vars
@@ -38,6 +38,7 @@ ACTION="None"
 INPUT="None"
 OUTPUT="None"
 SAFE_MODE="None"
+QRDUMP_VERSION="0.0"
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."
@@ -82,6 +83,8 @@ while true; do
             ACTION="Layout"; shift;;
         -t|--extract)
             ACTION="Extract"; shift;;
+        --version)
+            ACTION="Version"; shift;;
         --)
             shift; break;;
         *)
@@ -91,6 +94,11 @@ done
 
 if [ "$HELP" = "True" ]; then
     echo "TODO help"
+    exit 0
+fi
+
+if [ "$ACTION" = "Version" ]; then
+    echo "v${QRDUMP_VERSION}"
     exit 0
 fi
 
