@@ -9,7 +9,8 @@
 _qrdump(){
     COMPREPLY=()
 
-    local LIST_OPTIONS_NOARG=" --help --verbose --base64 --debug --encode --decode --read-A4 --create-A4 --safe-mode --layout --extract --version "
+    # TODO: metadata is only to be used after --create-A4 and --layout
+    local LIST_OPTIONS_NOARG=" --help --verbose --base64 --debug --encode --decode --read-A4 --create-A4 --safe-mode --layout --extract --version --metadata "
     local LIST_OPTIONS_PATH=" --output "
     local LIST_OPTIONS_FILE=" --input "
     local LIST_OPTIONS_DIGEST=" --digest "
