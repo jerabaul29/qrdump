@@ -11,6 +11,8 @@ The package is a set of bash scripts and functions to make it easy to:
 - Dump data as a set of several QR-codes, with extensive meta-data, and layout as a printable pdf.
 - Recover the QR-codes from the pdf dump, and assemble them together to re-create the initial data.
 
+Currently the size of the QR-codes and the layout on the A4 pdf pages are hard coded and cannot be changed easily (this may be improved with a future update). The 'small squares' inside the QR-codes have a side of 3x3 dots at 72dpi, which should be quite conservative for use with modern printers and scanners.
+
 # Use
 
 Quick example data file to A4 pdf and back:

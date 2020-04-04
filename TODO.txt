@@ -1,3 +1,5 @@
+- meaningful metadata
+
 - check all vars are "", to avoid the explicit split and glob
 - use shellcheck to see if things can be improved
 
@@ -28,3 +30,5 @@
 -- use it as a referential
 -- generate a new, well-formatted pdf
 - note: this should be in C++
+
+- 'app' for scanning a pdf A4 dump from a smartphone, either 1 page at a time, or qr-code after qr-code
