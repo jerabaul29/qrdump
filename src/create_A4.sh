@@ -112,7 +112,8 @@ create_page_of_qr_banners(){
     fi
 
     local PAGE_NUMBER=$1
-    local PAGE_NUMBER_REPR=$(int_with_5_digits $PAGE_NUMBER)
+    local DISPLAYED_PAGE_NUMBER=$(( $PAGE_NUMBER + 1 ))
+    local PAGE_NUMBER_REPR=$(int_with_5_digits $DISPLAYED_PAGE_NUMBER)
     local FOLDER_NAME=$2
 
     local FIRST_DATA_TO_USE=$3
@@ -138,7 +139,7 @@ create_page_of_qr_banners(){
 
     echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_top.txt
     # TODO: put some relevant metadata
-    echo "PAGE ${PAGE_NUMBER_REPR}; some relevant metadata" >> ${FOLDER_NAME}/text_top.txt
+    echo "PAGE ${PAGE_NUMBER_REPR} | some relevant metadata" >> ${FOLDER_NAME}/text_top.txt
     echo -n "\"" >> ${FOLDER_NAME}/text_top.txt
 
     convert -size 595x32 xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_top.txt ${FOLDER_NAME}/padding_page_top.png
@@ -173,12 +174,16 @@ create_page_of_qr_banners(){
 }
 
 assemble_into_A4(){
-    local INPUT=$1
-    local OUTPUT=$2
+    local INPUT="$1"
+    local OUTPUT="$2"
+    local METADATA="$3"
 
     local TMP_DIR=$(mktemp -d)
     cp -r ${INPUT}/* ${TMP_DIR}/.
     sync
+
+    local NBR_QR_CODES=$(ls -l ${TMP_DIR}/data-*\.png | wc -l)
+    local NBR_PAGES=$(( ($NBR_QR_CODES+5) / 6 + 1 ))
 
     convert -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_TOP_MARGIN} xc:white ${TMP_DIR}/top_margin.png
     convert -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_BOTTOM_MARGIN} xc:white ${TMP_DIR}/bottom_margin.png
@@ -190,14 +195,18 @@ assemble_into_A4(){
     # 1 QR code with layout information
     # the metadata QR code
 
-    # metadata text
-    # TODO: put relevant metadata here in plaintex
-    # TODO: use automatic padding function to pad
-    # TODO: force adding line breaks on the metadata to avoid cutting text.
-    echo -n "text 15,15   \"" >> ${TMP_DIR}/text_1st_page.txt
-    # this is the metadata that will be displayed
-    echo "some relevant metadata" >> ${TMP_DIR}/text_1st_page.txt
-    # TODO: file name, date, how stored, number of pages
+    echo "text 15,15   \"" >> ${TMP_DIR}/text_1st_page.txt
+
+    echo "page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
+
+    LC_TIME_old="${LC_TIME}"
+    LC_TIME="en_US.UTF-8"
+    whoami >> ${TMP_DIR}/text_1st_page.txt
+    date --utc >> ${TMP_DIR}/text_1st_page.txt
+    export LC_TIME="${LC_TIME_old}"
+
+    echo "$METADATA" >> ${TMP_DIR}/text_1st_page.txt
+
     echo -n "\"" >> ${TMP_DIR}/text_1st_page.txt
 
     convert -size ${QRDUMP_A4_TEXT_WIDTH}x${QRDUMP_A4_TEXT_HEIGHT} xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${TMP_DIR}/text_1st_page.txt ${TMP_DIR}/text_1st_page.png

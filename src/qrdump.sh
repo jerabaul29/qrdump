@@ -24,8 +24,8 @@ fi
 # TODO: implement the c and r
 
 # acceptable options
-OPTIONS=hvabg:edro:csi:lt
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version
+OPTIONS=hvabg:edro:csi:ltm:
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:
 
 # default values of the options
 # TODO: follow QRDUMP_ naming convention for global vars
@@ -39,6 +39,7 @@ INPUT="None"
 OUTPUT="None"
 SAFE_MODE="None"
 QRDUMP_VERSION="0.0"
+METADATA=""
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."
@@ -85,6 +86,8 @@ while true; do
             ACTION="Extract"; shift;;
         --version)
             ACTION="Version"; shift;;
+        -m|--metadata)
+                METADATA="$2"; shift 2;;
         --)
             shift; break;;
         *)
@@ -168,6 +171,14 @@ if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
     fi
 fi
 
+if [ ! "$METADATA" = "" ]; then
+    if [[ ! "${ACTION}" =~ ^(Layout|CreateA4)$ ]]; then
+        echo "using metadata, but:"
+        echo "metadata is used only for writing on the pdfs at creation"
+        exit 1
+    fi
+fi
+
 ##############################################
 # call the right command                     #
 ##############################################
@@ -197,7 +208,7 @@ case "$ACTION" in
         assert_set OUTPUT
         assert_avail_folder INPUT
         assert_avail_file_destination OUTPUT
-        assemble_into_A4 $INPUT $OUTPUT
+        assemble_into_A4 $INPUT $OUTPUT "$METADATA"
         ;;
     Extract)
         echo_verbose "execute extract"
@@ -215,7 +226,7 @@ case "$ACTION" in
         assert_avail_file_destination OUTPUT
         WORKING_DIR=$(mktemp -d)
         full_encode $INPUT $WORKING_DIR
-        assemble_into_A4 $WORKING_DIR $OUTPUT
+        assemble_into_A4 $WORKING_DIR $OUTPUT "$METADATA"
         rm -rf WORKING_DIR
         if [[ "$SAFE_MODE" = "True" ]]; then
             echo_verbose "checking that safe to extract"
