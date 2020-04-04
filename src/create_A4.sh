@@ -139,8 +139,9 @@ create_page_of_qr_banners(){
 
     echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_top.txt
     # TODO: put some relevant metadata
-    echo "PAGE ${PAGE_NUMBER_REPR} | some relevant metadata" >> ${FOLDER_NAME}/text_top.txt
-    echo -n "\"" >> ${FOLDER_NAME}/text_top.txt
+    echo -n "PAGE ${PAGE_NUMBER_REPR}; " >> ${FOLDER_NAME}/text_top.txt
+    cat ${FOLDER_NAME}/metadata_for_data_pages.txt >> ${FOLDER_NAME}/text_top.txt
+    echo -n " \"" >> ${FOLDER_NAME}/text_top.txt
 
     convert -size 595x32 xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_top.txt ${FOLDER_NAME}/padding_page_top.png
 
@@ -181,6 +182,8 @@ assemble_into_A4(){
     local TMP_DIR=$(mktemp -d)
     cp -r ${INPUT}/* ${TMP_DIR}/.
     sync
+
+    echo -n "$METADATA" >> ${TMP_DIR}/metadata_for_data_pages.txt
 
     local NBR_QR_CODES=$(ls -l ${TMP_DIR}/data-*\.png | wc -l)
     local NBR_PAGES=$(( ($NBR_QR_CODES+5) / 6 + 1 ))

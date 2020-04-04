@@ -1,4 +1,4 @@
-- meaningful metadata
+- metadata: make sure that not too long line with a head -c
 
 - check all vars are "", to avoid the explicit split and glob
 - use shellcheck to see if things can be improved

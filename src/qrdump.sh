@@ -39,7 +39,7 @@ INPUT="None"
 OUTPUT="None"
 SAFE_MODE="None"
 QRDUMP_VERSION="0.0"
-METADATA=""
+QRDUMP_METADATA=""
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."
@@ -87,7 +87,7 @@ while true; do
         --version)
             ACTION="Version"; shift;;
         -m|--metadata)
-                METADATA="$2"; shift 2;;
+                QRDUMP_METADATA="$2"; shift 2;;
         --)
             shift; break;;
         *)
@@ -171,12 +171,14 @@ if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
     fi
 fi
 
-if [ ! "$METADATA" = "" ]; then
+if [ ! "$QRDUMP_METADATA" = "" ]; then
     if [[ ! "${ACTION}" =~ ^(Layout|CreateA4)$ ]]; then
         echo "using metadata, but:"
         echo "metadata is used only for writing on the pdfs at creation"
         exit 1
     fi
+else
+    QRDUMP_METADATA="NO MSG"
 fi
 
 ##############################################
@@ -208,7 +210,7 @@ case "$ACTION" in
         assert_set OUTPUT
         assert_avail_folder INPUT
         assert_avail_file_destination OUTPUT
-        assemble_into_A4 $INPUT $OUTPUT "$METADATA"
+        assemble_into_A4 $INPUT $OUTPUT "$QRDUMP_METADATA"
         ;;
     Extract)
         echo_verbose "execute extract"
@@ -226,7 +228,7 @@ case "$ACTION" in
         assert_avail_file_destination OUTPUT
         WORKING_DIR=$(mktemp -d)
         full_encode $INPUT $WORKING_DIR
-        assemble_into_A4 $WORKING_DIR $OUTPUT "$METADATA"
+        assemble_into_A4 $WORKING_DIR $OUTPUT "$QRDUMP_METADATA"
         rm -rf WORKING_DIR
         if [[ "$SAFE_MODE" = "True" ]]; then
             echo_verbose "checking that safe to extract"
