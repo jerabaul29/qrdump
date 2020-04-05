@@ -23,7 +23,7 @@ bash-4.4$ cd $FOLDER_TESTS/
 bash-4.4$ head -c 4096 </dev/urandom > dummy.dat # create a random file, 4096 bytes
 bash-4.4$ sha256sum dummy.dat 
 02f2c6dd472f43e9187043271257c1bf87a2f43b771d843e45b201892d9e7b84  dummy.dat
-bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat # crete a printable qr-codes pdf of the file
+bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat --metadata "a user-define message" # crete a printable qr-codes pdf of the file
 SAFE to use: success restoring check
 bash-4.4$ rm dummy.dat # the file is removed, so from now on only way to get it back is to restore from the pdf
 bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --base64 --read-A4 --input pdf_dump.pdf --output ./ # restore
