@@ -75,8 +75,6 @@ full_encode(){
     echo -n "SHA512SUM:" >> ${CRRT_FILE}
     sha512sum "${INPUT}" | cut -d " " -f1 >> ${CRRT_FILE}
 
-    cat "${CRRT_FILE}"
-
     # check that metadata is not too heavy
     # use the same size as the max qrcode choosen previously
     if [[ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${QRDUMP_MAX_QR_SIZE} ]]; then
