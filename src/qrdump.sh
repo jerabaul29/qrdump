@@ -195,6 +195,7 @@ case "$ACTION" in
         assert_file_or_folder_exists INPUT
         assert_avail_folder OUTPUT
         full_encode $INPUT $OUTPUT
+        sha512sum "$INPUT" >> "$OUTPUT/sha512sum.meta"
         ;;
     Decode)
         echo_verbose "execute decode"
@@ -228,6 +229,7 @@ case "$ACTION" in
         assert_avail_file_destination OUTPUT
         WORKING_DIR=$(mktemp -d)
         full_encode $INPUT $WORKING_DIR
+        sha512sum "$INPUT" >> "$WORKING_DIR/sha512sum.meta"
         assemble_into_A4 $WORKING_DIR $OUTPUT "$QRDUMP_METADATA"
         rm -rf WORKING_DIR
         if [[ "$SAFE_MODE" = "True" ]]; then

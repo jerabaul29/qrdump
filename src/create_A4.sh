@@ -139,7 +139,7 @@ create_page_of_qr_banners(){
 
     echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_top.txt
     # TODO: put some relevant metadata
-    echo -n "PAGE ${PAGE_NUMBER_REPR}; " >> ${FOLDER_NAME}/text_top.txt
+    echo -n "PAGE ${PAGE_NUMBER_REPR} " >> ${FOLDER_NAME}/text_top.txt
     cat ${FOLDER_NAME}/metadata_for_data_pages.txt >> ${FOLDER_NAME}/text_top.txt
     echo -n " \"" >> ${FOLDER_NAME}/text_top.txt
 
@@ -183,7 +183,8 @@ assemble_into_A4(){
     cp -r ${INPUT}/* ${TMP_DIR}/.
     sync
 
-    echo -n "$METADATA" >> ${TMP_DIR}/metadata_for_data_pages.txt
+    cat "${TMP_DIR}/sha512sum.meta" | head -c 20 >> ${TMP_DIR}/metadata_for_data_pages.txt
+    echo -n " $METADATA" | head -c 30 >> ${TMP_DIR}/metadata_for_data_pages.txt
 
     local NBR_QR_CODES=$(ls -l ${TMP_DIR}/data-*\.png | wc -l)
     local NBR_PAGES=$(( ($NBR_QR_CODES+5) / 6 + 1 ))
@@ -200,7 +201,8 @@ assemble_into_A4(){
 
     echo "text 15,15   \"" >> ${TMP_DIR}/text_1st_page.txt
 
-    echo "page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n "page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n " | " >> ${TMP_DIR}/text_1st_page.txt
 
     LC_TIME_old="${LC_TIME}"
     LC_TIME="en_US.UTF-8"
@@ -208,11 +210,22 @@ assemble_into_A4(){
     date --utc >> ${TMP_DIR}/text_1st_page.txt
     export LC_TIME="${LC_TIME_old}"
 
-    echo "$METADATA" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n "SHA: " >> ${TMP_DIR}/text_1st_page.txt
+    cat "${TMP_DIR}/sha512sum.meta" | head -c 43 >> ${TMP_DIR}/text_1st_page.txt
+    echo "" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n "SHA: " >> ${TMP_DIR}/text_1st_page.txt
+    cat "${TMP_DIR}/sha512sum.meta" | head -c 86 | tail -c 43 >> ${TMP_DIR}/text_1st_page.txt
+    echo "" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n "SHA: " >> ${TMP_DIR}/text_1st_page.txt
+    # TODO: problem here, should be 42 instead of 41 under, do not understand why this is a problem
+    cat "${TMP_DIR}/sha512sum.meta" | head -c 128 | tail -c 42 >> ${TMP_DIR}/text_1st_page.txt
+    echo "" >> ${TMP_DIR}/text_1st_page.txt
+
+    echo "$METADATA" | fold -s -w 60 | head -5 >> ${TMP_DIR}/text_1st_page.txt
 
     echo -n "\"" >> ${TMP_DIR}/text_1st_page.txt
 
-    convert -size ${QRDUMP_A4_TEXT_WIDTH}x${QRDUMP_A4_TEXT_HEIGHT} xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${TMP_DIR}/text_1st_page.txt ${TMP_DIR}/text_1st_page.png
+    convert -size ${QRDUMP_A4_TEXT_WIDTH}x${QRDUMP_A4_TEXT_HEIGHT} xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${TMP_DIR}/text_1st_page.txt -depth 8 ${TMP_DIR}/text_1st_page.png
 
     convert ${TMP_DIR}/text_left_margin.png ${TMP_DIR}/text_1st_page.png ${TMP_DIR}/text_right_margin.png +append ${TMP_DIR}/text_image_chunk.png
 

@@ -84,6 +84,12 @@ bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mo
 SAFE to use: success restoring check
 ```
 
+- Yhe metadata can be quite long, and it will be if needed cut, and wrapped, as needed, but the dump will not fail / be corrupted:
+
+```
+bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat --metadata "this is the metadata message aaaa bbbbb ccccc ddddd eeeee fffff ggggg qqqqq ggkgewg gnwpgwqgq. it can be quite long, and will be cut / wrapped as needed. is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+```
+
 - The repo is under construction still:
 
 :warning: :construction: **this is a very recent tool still under construction; consider waiting a bit before starting to use the code here for production; contributions / feedback / code reviews welcome though** :construction: :warning:
