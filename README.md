@@ -33,7 +33,7 @@ bash-4.4$ sha256sum dummy.dat # the digest should be the same as the initial one
 
 The pdf_dump.pdf is easily printable (and then scannable back in many years). A bit of metadata (page number) is present by default. Additional metadata can be added either on first page, or on the top of each page (NOTE: work in progress, TODO: implement). For example, the pdf output (shown fully with pages side-by-side) for the 4096 bytes example looks like:
 
-![Illustration of pdf output (here dump of 4096 bytes)](doc/illustration_pdf_dump/illustration.png?raw=true)
+![Illustration of pdf output (here dump of 4096 bytes)](doc/illustration_pdf_dump/illustration_2.png?raw=true)
 
 # Installation
 
