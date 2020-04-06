@@ -139,7 +139,7 @@ create_page_of_qr_banners(){
 
     echo -n "text 15,15   \"" >> ${FOLDER_NAME}/text_top.txt
     # TODO: put some relevant metadata
-    echo -n "PAGE ${PAGE_NUMBER_REPR} " >> ${FOLDER_NAME}/text_top.txt
+    echo -n "P ${PAGE_NUMBER_REPR} " >> ${FOLDER_NAME}/text_top.txt
     cat ${FOLDER_NAME}/metadata_for_data_pages.txt >> ${FOLDER_NAME}/text_top.txt
     echo -n " \"" >> ${FOLDER_NAME}/text_top.txt
 

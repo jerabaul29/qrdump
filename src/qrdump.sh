@@ -178,6 +178,7 @@ if [ ! "$QRDUMP_METADATA" = "" ]; then
         exit 1
     fi
 else
+    echo "WARNING: metadata not set, using the defaul 'NO MSG' metadata"
     QRDUMP_METADATA="NO MSG"
 fi
 
