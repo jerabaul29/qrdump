@@ -37,13 +37,13 @@ pad_png_image(){
     local ADD_TOP=$(( (${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE}) / 2 ))
     local ADD_BOTTOM=$(( ${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE} - ${ADD_TOP} ))
 
-    convert -size ${ADD_LEFT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/left_margin.png
-    convert -size ${ADD_RIGHT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/right_margin.png
+    convert -depth 8 -size ${ADD_LEFT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/left_margin.png
+    convert -depth 8 -size ${ADD_RIGHT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/right_margin.png
 
     convert ${BASE_FOLDER}/left_margin.png ${PNG_IN} ${BASE_FOLDER}/right_margin.png +append ${BASE_FOLDER}/padded_left_right.png
 
-    convert -size ${FINAL_X_SIZE}x${ADD_TOP} xc:white ${BASE_FOLDER}/top_margin.png
-    convert -size ${FINAL_X_SIZE}x${ADD_BOTTOM} xc:white ${BASE_FOLDER}/bottom_margin.png
+    convert -depth 8 -size ${FINAL_X_SIZE}x${ADD_TOP} xc:white ${BASE_FOLDER}/top_margin.png
+    convert -depth 8 -size ${FINAL_X_SIZE}x${ADD_BOTTOM} xc:white ${BASE_FOLDER}/bottom_margin.png
 
     convert ${BASE_FOLDER}/top_margin.png ${BASE_FOLDER}/padded_left_right.png ${BASE_FOLDER}/bottom_margin.png -append ${PNG_OUT}
 }
@@ -70,15 +70,15 @@ create_banner_of_qr_codes(){
     if [ "$#" -lt 4 ]
     then
         # need to create the second qr code as empty
-        convert -size 269x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
+        convert -depth 8 -size 269x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
         local SECOND_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
     else
         local SECOND_DATA_TO_USE=$4
     fi
 
 
-    convert -size 23x269 xc:white ${FOLDER_NAME}/padding_banner_sides.png
-    convert -size 11x269 xc:white ${FOLDER_NAME}/padding_banner_middle.png
+    convert -depth 8 -size 23x269 xc:white ${FOLDER_NAME}/padding_banner_sides.png
+    convert -depth 8 -size 11x269 xc:white ${FOLDER_NAME}/padding_banner_middle.png
 
     convert ${FOLDER_NAME}/padding_banner_sides.png ${FIRST_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_middle.png ${SECOND_DATA_TO_USE} ${FOLDER_NAME}/padding_banner_sides.png +append ${FOLDER_NAME}/banner_${BANNER_NUMBER_REPR}.png
 
@@ -120,7 +120,7 @@ create_page_of_qr_banners(){
 
     if [ "$#" -lt 5 ]
     then
-        convert -size 595x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
+        convert -depth 8 -size 595x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
         local THIRD_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
     else
         local THIRD_DATA_TO_USE=$5
@@ -143,12 +143,12 @@ create_page_of_qr_banners(){
     cat ${FOLDER_NAME}/metadata_for_data_pages.txt >> ${FOLDER_NAME}/text_top.txt
     echo -n " \"" >> ${FOLDER_NAME}/text_top.txt
 
-    convert -size 595x32 xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_top.txt ${FOLDER_NAME}/padding_page_top.png
+    convert -depth 8 -size 595x32 xc:white -font "FreeMono" -pointsize 14 -fill black -draw @${FOLDER_NAME}/text_top.txt ${FOLDER_NAME}/padding_page_top.png
 
     rm ${FOLDER_NAME}/text_top.txt
 
-    convert -size 595x1 xc:white ${FOLDER_NAME}/padding_page_middle.png
-    convert -size 595x1 xc:white ${FOLDER_NAME}/padding_page_bottom.png
+    convert -depth 8 -size 595x1 xc:white ${FOLDER_NAME}/padding_page_middle.png
+    convert -depth 8 -size 595x1 xc:white ${FOLDER_NAME}/padding_page_bottom.png
 
     convert ${FOLDER_NAME}/padding_page_top.png \
         ${FIRST_DATA_TO_USE} \
@@ -189,10 +189,10 @@ assemble_into_A4(){
     local NBR_QR_CODES=$(ls -l ${TMP_DIR}/data-*\.png | wc -l)
     local NBR_PAGES=$(( ($NBR_QR_CODES+5) / 6 + 1 ))
 
-    convert -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_TOP_MARGIN} xc:white ${TMP_DIR}/top_margin.png
-    convert -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_BOTTOM_MARGIN} xc:white ${TMP_DIR}/bottom_margin.png
-    convert -size ${QRDUMP_A4_LEFT_MARGIN}x${QRDUMP_A4_TEXT_HEIGHT} xc:white ${TMP_DIR}/text_left_margin.png
-    convert -size ${QRDUMP_A4_RIGHT_MARGIN}x${QRDUMP_A4_TEXT_HEIGHT} xc:white ${TMP_DIR}/text_right_margin.png
+    convert -depth 8 -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_TOP_MARGIN} xc:white ${TMP_DIR}/top_margin.png
+    convert -depth 8 -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_BOTTOM_MARGIN} xc:white ${TMP_DIR}/bottom_margin.png
+    convert -depth 8 -size ${QRDUMP_A4_LEFT_MARGIN}x${QRDUMP_A4_TEXT_HEIGHT} xc:white ${TMP_DIR}/text_left_margin.png
+    convert -depth 8 -size ${QRDUMP_A4_RIGHT_MARGIN}x${QRDUMP_A4_TEXT_HEIGHT} xc:white ${TMP_DIR}/text_right_margin.png
 
     # 1st page: contain the metadata ----- ------------------------------
     # tile and a few written information
