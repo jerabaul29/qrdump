@@ -11,6 +11,7 @@ full_encode(){
     local INPUT=$1
     local OUTPUT=$2
 
+    # TODO: use part of the SHA instead
     # generate a random signature ID for the package
     # alphanumeric with numbers to keep things easy (binary introduces challenges with null bytes etc)
     local ID=$(dd if=/dev/urandom  bs=512 count=1 status=none | tr -dc 'a-zA-Z0-9' | fold -w ${QRDUMP_SIZE_ID} | head -n 1)
@@ -101,4 +102,9 @@ full_encode(){
         echo_verbose "removed working tmp: ${TMP_DIR}"
         rm -r $TMP_DIR
     fi
+
+    # TODO: generate the par2 correction codes
+    # TODO: in metadata put the nbr of data qr-codes
+    # then here: qr-code with name of file, then dump
+    # of the par2 file, as many times as needed
 }

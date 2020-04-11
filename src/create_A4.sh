@@ -201,7 +201,7 @@ assemble_into_A4(){
 
     echo "text 15,15   \"" >> ${TMP_DIR}/text_1st_page.txt
 
-    echo -n "page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n "qrdump v${QRDUMP_VERSION} | page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
     echo -n " | " >> ${TMP_DIR}/text_1st_page.txt
 
     LC_TIME_old="${LC_TIME}"
@@ -209,6 +209,8 @@ assemble_into_A4(){
     whoami >> ${TMP_DIR}/text_1st_page.txt
     date --utc >> ${TMP_DIR}/text_1st_page.txt
     export LC_TIME="${LC_TIME_old}"
+
+    echo "$QRDUMP_ORIGINAL_INPUT" >> ${TMP_DIR}/text_1st_page.txt
 
     echo -n "SHA: " >> ${TMP_DIR}/text_1st_page.txt
     cat "${TMP_DIR}/sha512sum.meta" | head -c 43 >> ${TMP_DIR}/text_1st_page.txt

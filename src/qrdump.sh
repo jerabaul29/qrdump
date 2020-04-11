@@ -24,8 +24,8 @@ fi
 # TODO: implement the c and r
 
 # acceptable options
-OPTIONS=hvabg:edro:csi:ltm:
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:
+OPTIONS=hvabg:edro:csi:ltm:p
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:,parchive
 
 # default values of the options
 # TODO: follow QRDUMP_ naming convention for global vars
@@ -37,9 +37,9 @@ DIGEST="sha1sum"
 ACTION="None"
 INPUT="None"
 OUTPUT="None"
-SAFE_MODE="None"
-QRDUMP_VERSION="0.0"
+SAFE_MODE="False"
 QRDUMP_METADATA=""
+QRDUMP_PARCHIVE="False"
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."
@@ -87,7 +87,9 @@ while true; do
         --version)
             ACTION="Version"; shift;;
         -m|--metadata)
-                QRDUMP_METADATA="$2"; shift 2;;
+            QRDUMP_METADATA="$2"; shift 2;;
+        -p|--parchive)
+            QRDUMP_PARCHIVE="True"; shift;;
         --)
             shift; break;;
         *)
@@ -121,6 +123,8 @@ source ./ReadA4.sh
 INPUT=$(expand_full_relative_path "${CWD}" "${INPUT}")
 OUTPUT=$(expand_full_relative_path "${CWD}" "${OUTPUT}")
 
+QRDUMP_ORIGINAL_INPUT="$(basename ${INPUT})"
+
 ##############################################
 # in case of debug, show the options         #
 ##############################################
@@ -138,6 +142,7 @@ show_debug_variable "INPUT"
 show_debug_variable "OUTPUT"
 show_debug_variable "SAFE_MODE"
 show_debug_variable "CWD"
+show_debug_variable "QRDUMP_PARCHIVE"
 echo_verbose "----------------------------------------"
 echo_verbose " "
 
@@ -162,6 +167,19 @@ if [[ "$SAFE_MODE" = "True" ]]; then
     fi
 fi
 
+if [[ "${ACTION}" = "CreateA4" ]]; then
+    if [[ "${SAFE_MODE}" = "False" ]]; then
+        echo "WARNING: running a create-A4 without --safe-mode"
+    fi
+fi
+
+if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
+    if [[ ! "$ACTION" = "CreateA4" ]]; then
+        echo "--parchive is only possible with --create-A4"
+        exit 1
+    fi
+fi
+
 # only support files as input; the user should zip himself if want to use on folder
 if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
     if [ ! -f $INPUT ]; then
@@ -178,8 +196,10 @@ if [ ! "$QRDUMP_METADATA" = "" ]; then
         exit 1
     fi
 else
-    echo "WARNING: metadata not set, using the defaul 'NO MSG' metadata"
-    QRDUMP_METADATA="NO MSG"
+    if [[ "${ACTION}" =~ ^(Layout|CreateA4)$ ]]; then
+        echo "WARNING: metadata not set, using the defaul 'NO MSG' metadata"
+        QRDUMP_METADATA="NO MSG"
+    fi
 fi
 
 ##############################################
@@ -232,18 +252,37 @@ case "$ACTION" in
         full_encode $INPUT $WORKING_DIR
         sha512sum "$INPUT" >> "$WORKING_DIR/sha512sum.meta"
         assemble_into_A4 $WORKING_DIR $OUTPUT "$QRDUMP_METADATA"
-        rm -rf WORKING_DIR
+
         if [[ "$SAFE_MODE" = "True" ]]; then
             echo_verbose "checking that safe to extract"
             TMP_OUT=$(mktemp -d)/
             WORKING_DIR_2=$(mktemp -d)
             extract_all_QR_codes $OUTPUT $WORKING_DIR_2
             full_decode $WORKING_DIR_2 $TMP_OUT
-            assert_identical $TMP_OUT/$(basename $INPUT) $INPUT
+            assert_identical $INPUT $TMP_OUT/$(basename $INPUT)
             rm -rf $WORKING_DIR_2
             rm -rf TMP_OUT
         fi
         rm -rf $WORKING_DIR
+
+        if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
+            WORKING_DIR_2=$(mktemp -d)
+            echo_verbose "doing a parchive dump"
+            cp "${INPUT}" "${WORKING_DIR_2}/"
+            par2 create -qq -s${QRDUMP_PARCHIVE_SIZE} -r${QRDUMP_PARCHIVE_REDUNDANCY} "${WORKING_DIR_2}/$(basename ${INPUT})"
+
+            for CRRT_PAR2 in ${WORKING_DIR_2}/*\.par2; do
+                CRRT_PDF_NAME="${WORKING_DIR_2}/$(basename ${CRRT_PAR2}).pdf"
+                QRDUMP_GLOBAL_OUTPUT=$(dirname ${OUTPUT})
+
+                (bash ./qrdump.sh --base64 --create-A4 --safe-mode --input "${CRRT_PAR2}" --output "${CRRT_PDF_NAME}" --metadata "parchive dump for error correction of main dump")&
+                wait $!
+
+                mv "${CRRT_PDF_NAME}" "${QRDUMP_GLOBAL_OUTPUT}/$(basename ${CRRT_PDF_NAME})"
+            done
+
+            rm -rf $WORKING_DIR_2
+        fi
         ;;
     ReadA4)
         echo_verbose "execute read pdf"

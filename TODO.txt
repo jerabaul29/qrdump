@@ -1,6 +1,8 @@
 - metadata: make sure that not too long line with a head -c
 - metadata: prepend with file name etc from the script CORRECTLY ie from the initial input
 
+- design better tests for the parchive thing
+
 - check all vars are "", to avoid the explicit split and glob
 - use shellcheck to see if things can be improved
 

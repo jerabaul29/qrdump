@@ -23,6 +23,8 @@ fi
 echo_verbose "----------------------------------------"
 echo_verbose "show qrdump params"
 
+QRDUMP_VERSION="0.0"
+
 # using no digest for now; todo: check
 # SIZE_DIGEST=$(echo -n "anything" | digest_function | wc -c)
 SIZE_DIGEST=0
@@ -73,6 +75,12 @@ show_debug_variable QRDUMP_A4_BOTTOM_MARGIN
 show_debug_variable QRDUMP_A4_LINE_JUMP
 show_debug_variable QRDUMP_A4_TEXT_WIDTH
 show_debug_variable QRDUMP_A4_TEXT_HEIGHT
+
+QRDUMP_PARCHIVE_SIZE=512
+QRDUMP_PARCHIVE_REDUNDANCY=15
+
+show_debug_variable QRDUMP_PARCHIVE_SIZE
+show_debug_variable QRDUMP_PARCHIVE_REDUNDANCY
 
 echo_verbose "----------------------------------------"
 echo_verbose " "

@@ -140,9 +140,9 @@ assert_identical(){
 
     if [[ "${DIGEST_1}" = "${DIGEST_2}" ]]
     then
-        echo "SAFE to use: success restoring check"
+        echo "SAFE to use: success restoring check on $FILE_1"
     else
-        echo "UNSAFE to use: error restoring, non identical file!"
+        echo "UNSAFE to use: error restoring, non identical file with $FILE_1!"
         exit 1
     fi
 }
