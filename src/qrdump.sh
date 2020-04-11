@@ -171,6 +171,9 @@ if [[ "${ACTION}" = "CreateA4" ]]; then
     if [[ "${SAFE_MODE}" = "False" ]]; then
         echo "WARNING: running a create-A4 without --safe-mode"
     fi
+    if [[ "${QRDUMP_PARCHIVE}" = "False" ]]; then
+        echo "WARNING: no --parchive dumping; this is recommended to allow robustness"
+    fi
 fi
 
 if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
