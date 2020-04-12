@@ -54,6 +54,7 @@ dd: coreutils
 truncate: coreutils
 convert: imagemagick
 img2pdf: img2pdf
+par2: par2
 ```
 
 - for autocomplete, source ```completion/qrdump_completion.sh```
