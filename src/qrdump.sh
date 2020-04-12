@@ -41,6 +41,7 @@ SAFE_MODE="False"
 QRDUMP_METADATA=""
 QRDUMP_PARCHIVE="False"
 QRDUMP_MANUAL="False"
+QRDUMP_VERSION="0.0"
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."

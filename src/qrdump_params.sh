@@ -23,8 +23,6 @@ fi
 echo_verbose "----------------------------------------"
 echo_verbose "show qrdump params"
 
-QRDUMP_VERSION="0.0"
-
 # using no digest for now; todo: check
 # SIZE_DIGEST=$(echo -n "anything" | digest_function | wc -c)
 SIZE_DIGEST=0
