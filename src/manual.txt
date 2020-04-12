@@ -1,5 +1,55 @@
-qrdump: a tool for long-time paper archiving of data within multiple qr-codes.
+\033[1mqrdump: a tool for long-time paper archiving of data within multiple qr-codes.\033[0m
 
-Set of bash scripts for dumping a file into a series of QR-codes together with metadata and putting these together into a series of A4 pdf pages, with the aim of long-term archiving on printed paper, and recovering them from a scan later on.
+\033[1mDESCRIPTION\033[0m
+    qrdump is a set of bash scripts for dumping a file into a series of
+    QR-codes together with metadata and putting these together into a series of
+    A4 pdf pages, with the aim of long-term archiving on printed paper, and
+    recovering them from a scan later on.
 
+\033[1mCOMMANDS\033[0m
+    \033[1mACTIONS\033[0m
+        -c|--create-A4
+            Create a A4 dump of the data.
+        -r|--read-A4
+            Read a A4 document, extract the qr-codes, and perform decoding.
+        -h|--help
+            Display help.
+        --version
+            Print the version of the package.
+    \033[1mOPTIONS\033[0m
+        -v|--verbose
+            Turn on verbose output.
+        -a|--base64
+            Use base64 encoding of the data. Currently REQUIRED as zbarimg
+            does not Currently support binary data extraction.
+        -b|--debug
+            Turn on debugging output.
+        -o|--output
+            Set the current output or the command. Output must be a file when
+            creating a pdf, and a path when extracting.
+        -s|--safe-mode
+            Use safe mode, together with the --create-A4 command: attempt to
+            perform decoding at once to confirm that data can be extracted.
+        -i|--input
+            The input file. When --create-A4, this is the file to dump. When
+            --read-A4, this is the pdf to use for extracting information.
+        -m|--metadata
+            Set the metadata together with the --create-A4 command. Metadata will
+            be written on the first page of the pdf.
+        -p|--parchive
+            Create parchive error correction data, and dump all par2 files in
+            separate pdfs.
+        --manual)
 
+\033[1mEXAMPLE\033[0m
+    bash-4.4$ FOLDER_TESTS=$(mktemp -d)
+    bash-4.4$ cd $FOLDER_TESTS/
+    bash-4.4$ head -c 4096 </dev/urandom > dummy.dat # create a random file, 4096 bytes
+    bash-4.4$ sha256sum dummy.dat 
+    02f2c6dd472f43e9187043271257c1bf87a2f43b771d843e45b201892d9e7b84  dummy.dat
+    bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat --metadata "a user-define message" # crete a printable qr-codes pdf of the file
+    SAFE to use: success restoring check
+    bash-4.4$ rm dummy.dat # the file is removed, so from now on only way to get it back is to restore from the pdf
+    bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --base64 --read-A4 --input pdf_dump.pdf --output ./ # restore
+    bash-4.4$ sha256sum dummy.dat # the digest should be the same as the initial one to confirm good restore
+    02f2c6dd472f43e9187043271257c1bf87a2f43b771d843e45b201892d9e7b84  dummy.dat

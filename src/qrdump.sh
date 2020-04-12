@@ -101,12 +101,12 @@ while true; do
 done
 
 if [ "$HELP" = "True" ]; then
-    cat ./help.txt
+    echo -e "$(cat help.txt)"
     exit 0
 fi
 
 if [ "$QRDUMP_MANUAL" = "True" ]; then
-    cat ./manual.txt
+    echo -e "$(cat manual.txt)"
     exit 0
 fi
 
