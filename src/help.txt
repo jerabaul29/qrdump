@@ -1,0 +1,25 @@
+qrdump: a tool for long-time paper archiving of data within multiple qr-codes.
+
+Recommended use:
+    - dumping a file to a A4 document, using base64 encoding, in safe mode (check at once that extraction is ok), dumping also parchive (to allow error correction is needed):
+
+    $ qrdump --create-A4 \
+             --base64 \
+             --safe-mode \
+             --parchive \
+             --output PATH_TO_OUTPUT \
+             --input PATH_TO_FILE \
+             --metadata "user-define message"
+
+    - extracting a file from an A4 document dumped with the previous command:
+
+    $ qrdump --read-A4 \
+             --base64 \
+             --input PATH_TO_A4_PDF \
+             --output PATH_FOR_EXTRACTED
+
+Release notes:
+    - At the current time, only base64 enoding is supported. See: https://stackoverflow.com/questions/60506222 . Native binary encoding will be released as soon as zbarimg has been updated on most distros to support this.
+    - For now, it is the responsibility of the user to zip / tar / other folders before feeding to qrdump if a whole tree should be archived.
+
+For more details, see the manual: $ qrdump --manual

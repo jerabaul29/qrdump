@@ -25,7 +25,7 @@ fi
 
 # acceptable options
 OPTIONS=hvabg:edro:csi:ltm:p
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:,parchive
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:,parchive,manual
 
 # default values of the options
 # TODO: follow QRDUMP_ naming convention for global vars
@@ -40,6 +40,7 @@ OUTPUT="None"
 SAFE_MODE="False"
 QRDUMP_METADATA=""
 QRDUMP_PARCHIVE="False"
+QRDUMP_MANUAL="False"
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."
@@ -90,6 +91,8 @@ while true; do
             QRDUMP_METADATA="$2"; shift 2;;
         -p|--parchive)
             QRDUMP_PARCHIVE="True"; shift;;
+        --manual)
+            QRDUMP_MANUAL="True"; shift;;
         --)
             shift; break;;
         *)
@@ -98,7 +101,12 @@ while true; do
 done
 
 if [ "$HELP" = "True" ]; then
-    echo "TODO help"
+    cat ./help.txt
+    exit 0
+fi
+
+if [ "$QRDUMP_MANUAL" = "True" ]; then
+    cat ./manual.txt
     exit 0
 fi
 

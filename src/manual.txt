@@ -1,0 +1,5 @@
+qrdump: a tool for long-time paper archiving of data within multiple qr-codes.
+
+Set of bash scripts for dumping a file into a series of QR-codes together with metadata and putting these together into a series of A4 pdf pages, with the aim of long-term archiving on printed paper, and recovering them from a scan later on.
+
+
