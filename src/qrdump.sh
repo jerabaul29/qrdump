@@ -25,7 +25,7 @@ fi
 
 # acceptable options
 OPTIONS=hvabg:edro:csi:ltm:p
-LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:,parchive,manual
+LONGOPTS=help,verbose,base64,debug,digest:,encode,decode,read-A4,output:,create-A4,safe-mode,input:,layout,extract,version,metadata:,parchive,manual,allow-whitespace
 
 # default values of the options
 # TODO: follow QRDUMP_ naming convention for global vars
@@ -41,6 +41,7 @@ SAFE_MODE="False"
 QRDUMP_METADATA=""
 QRDUMP_PARCHIVE="False"
 QRDUMP_MANUAL="False"
+QRDUMP_ALLOW_WHITESPACE="False"
 QRDUMP_VERSION="0.0"
 
 if [ $# -eq 0 ]; then
@@ -94,6 +95,8 @@ while true; do
             QRDUMP_PARCHIVE="True"; shift;;
         --manual)
             QRDUMP_MANUAL="True"; shift;;
+        --allow-whitespace)
+            QRDUMP_ALLOW_WHITESPACE="True"; shift;;
         --)
             shift; break;;
         *)
@@ -131,6 +134,9 @@ source ./ReadA4.sh
 
 INPUT=$(expand_full_relative_path "${CWD}" "${INPUT}")
 OUTPUT=$(expand_full_relative_path "${CWD}" "${OUTPUT}")
+
+detect_space INPUT
+detect_space OUTPUT
 
 QRDUMP_ORIGINAL_INPUT="$(basename ${INPUT})"
 

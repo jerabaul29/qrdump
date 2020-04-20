@@ -147,6 +147,25 @@ assert_identical(){
     fi
 }
 
+detect_space(){
+    local VARNAME=$1
+    local PATH=${!VARNAME}
+
+    re="[[:space:]]+"
+    if [[ ${PATH} =~ $re ]]; then
+        echo "${VARNAME} contains one or more space:"
+        echo "${PATH}"
+
+        if [ "${QRDUMP_ALLOW_WHITESPACE}" = "True" ]; then
+            echo "ignore error because of the --allow-whitespace option"
+        else
+            echo "avoid using spaces in paths or filenames!"
+            echo "to override this warning, use the --allow-whitespace option"
+            exit 1
+        fi
+    fi
+}
+
 # digest_function(){
 #     if [[ "$#" = "1" ]]
 #     then
