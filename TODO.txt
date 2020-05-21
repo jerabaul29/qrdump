@@ -5,7 +5,6 @@
 
 - design better tests for the parchive thing
 
-- check all vars are "", to avoid the explicit split and glob
 - use shellcheck to see if things can be improved
 
 - add test coverage no arg

@@ -3,7 +3,7 @@ source ./qrdump_params.sh --no-print
 source ./tools.sh
 
 extract_QR_codes_from_pages(){
-    local BASE_FOLDER=$1
+    local BASE_FOLDER="$1"
 
     local CRRT_QR_CODE_NBR=0
 
@@ -14,27 +14,27 @@ extract_QR_codes_from_pages(){
 
         # first banner
         convert "${CRRT_PAGE}[297x269+0+32]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
-        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        CRRT_QR_CODE_NBR="$(( ${CRRT_QR_CODE_NBR} + 1  ))"
         convert "${CRRT_PAGE}[297x269+297+32]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
-        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        CRRT_QR_CODE_NBR="$(( ${CRRT_QR_CODE_NBR} + 1  ))"
 
         # second banner
         convert "${CRRT_PAGE}[297x269+0+302]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
-        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        CRRT_QR_CODE_NBR="$(( ${CRRT_QR_CODE_NBR} + 1  ))"
         convert "${CRRT_PAGE}[297x269+297+302]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
-        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        CRRT_QR_CODE_NBR="$(( ${CRRT_QR_CODE_NBR} + 1  ))"
 
         # third banner
         convert "${CRRT_PAGE}[297x269+0+572]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
-        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        CRRT_QR_CODE_NBR="$(( ${CRRT_QR_CODE_NBR} + 1  ))"
         convert "${CRRT_PAGE}[297x269+297+572]" ${BASE_FOLDER}/data-$(int_with_5_digits ${CRRT_QR_CODE_NBR}).png &> /dev/null
-        CRRT_QR_CODE_NBR=$(( ${CRRT_QR_CODE_NBR} + 1  ))
+        CRRT_QR_CODE_NBR="$(( ${CRRT_QR_CODE_NBR} + 1  ))"
     done
 }
 
 extract_all_QR_codes(){
-    local INPUT=$1
-    local OUTPUT=$2
+    local INPUT="$1"
+    local OUTPUT="$2"
 
     # split pages
     convert -density 72 ${INPUT} ${OUTPUT}/extracted_A4_page_%04d.png &> /dev/null
@@ -56,7 +56,7 @@ extract_all_QR_codes(){
 
     for CRRT_QR_CODE in ${OUTPUT}/data-*.png
     do
-        local IS_EMPTY=$(identify -format "%[fx:(mean==1)?1:0]" ${CRRT_QR_CODE})
+        local IS_EMPTY="$(identify -format "%[fx:(mean==1)?1:0]" ${CRRT_QR_CODE})"
 
         if [[ ${IS_EMPTY} = "0" ]]
         then

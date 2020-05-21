@@ -8,17 +8,17 @@ full_encode(){
     echo_verbose "----------------------------------------"
     echo_verbose "entering function full_encode"
 
-    local INPUT=$1
-    local OUTPUT=$2
+    local INPUT="$1"
+    local OUTPUT="$2"
 
     # TODO: use part of the SHA instead
     # generate a random signature ID for the package
     # alphanumeric with numbers to keep things easy (binary introduces challenges with null bytes etc)
-    local ID=$(dd if=/dev/urandom  bs=512 count=1 status=none | tr -dc 'a-zA-Z0-9' | fold -w ${QRDUMP_SIZE_ID} | head -n 1)
+    local ID="$(dd if=/dev/urandom  bs=512 count=1 status=none | tr -dc 'a-zA-Z0-9' | fold -w ${QRDUMP_SIZE_ID} | head -n 1)"
     show_debug_variable ID
 
     # create temporary folder
-    local TMP_DIR=$(mktemp -d)
+    local TMP_DIR="$(mktemp -d)"
     show_debug_variable TMP_DIR
 
     # compress the destination file
@@ -28,7 +28,7 @@ full_encode(){
     # into segments to be used for qr-codes.
     split -d -a 6 -b ${QRDUMP_CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
 
-    local NBR_DATA_SEGMENTS=$(find ${TMP_DIR} -name 'data-*' | wc -l)
+    local NBR_DATA_SEGMENTS="$(find ${TMP_DIR} -name 'data-*' | wc -l)"
     echo_verbose "split into ${NBR_DATA_SEGMENTS} segments"
 
     # append for each data segment
@@ -40,7 +40,7 @@ full_encode(){
         echo -n "${ID}" >> ${CRRT_FILE}
 
         printf "0: %.4x" $COUNTER | xxd -r -g0 >> ${CRRT_FILE}
-        local COUNTER=$((COUNTER+1))
+        local COUNTER="$((COUNTER+1))"
     done
 
     # generate the data segments qr codes
@@ -51,7 +51,7 @@ full_encode(){
     # generate the qr code with the metadata
     echo_verbose "create metadata"
 
-    local CRRT_FILE=${TMP_DIR}/metadata
+    local CRRT_FILE="${TMP_DIR}/metadata"
     echo -n "QRD:" >> ${CRRT_FILE}
     echo "$(basename ${INPUT})" >> ${CRRT_FILE}
 

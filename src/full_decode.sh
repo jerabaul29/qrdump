@@ -8,11 +8,11 @@ full_decode(){
     echo_verbose "----------------------------------------"
     echo_verbose "entering function full_decode"
 
-    local INPUT=$1
-    local OUTPUT=$2
+    local INPUT="$1"
+    local OUTPUT="$2"
 
     # to all these operations in a tmp folder
-    local TMP_DIR=$(mktemp -d)
+    local TMP_DIR="$(mktemp -d)"
 
     cp ${INPUT}/*\.png ${TMP_DIR}/.
     sync
@@ -37,7 +37,7 @@ full_decode(){
     # read the metadata
     # TODO: move to a function
     # NOTE: had tried but encountered problems, probably something stupid
-    local METADATA_PATH=${TMP_DIR}/metadata.dat
+    local METADATA_PATH="${TMP_DIR}/metadata.dat"
     local IFS=":"
 
     while read -r NAME VALUE

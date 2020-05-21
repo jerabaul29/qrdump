@@ -49,7 +49,7 @@ if [ $# -eq 0 ]; then
     HELP="True"
 fi
 
-! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
+! PARSED="$(getopt --options="$OPTIONS" --longoptions="$LONGOPTS" --name "$0" -- "$@")"
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
     exit 2
 fi
@@ -132,8 +132,8 @@ source ./full_decode.sh
 source ./create_A4.sh
 source ./ReadA4.sh
 
-INPUT=$(expand_full_relative_path "${CWD}" "${INPUT}")
-OUTPUT=$(expand_full_relative_path "${CWD}" "${OUTPUT}")
+INPUT="$(expand_full_relative_path "${CWD}" "${INPUT}")"
+OUTPUT="$(expand_full_relative_path "${CWD}" "${OUTPUT}")"
 
 detect_space INPUT
 detect_space OUTPUT
@@ -266,15 +266,15 @@ case "$ACTION" in
         assert_set OUTPUT
         assert_file_or_folder_exists INPUT
         assert_avail_file_destination OUTPUT
-        WORKING_DIR=$(mktemp -d)
+        WORKING_DIR="$(mktemp -d)"
         full_encode $INPUT $WORKING_DIR
         sha512sum "$INPUT" >> "$WORKING_DIR/sha512sum.meta"
         assemble_into_A4 $WORKING_DIR $OUTPUT "$QRDUMP_METADATA"
 
         if [[ "$SAFE_MODE" = "True" ]]; then
             echo_verbose "checking that safe to extract"
-            TMP_OUT=$(mktemp -d)/
-            WORKING_DIR_2=$(mktemp -d)
+            TMP_OUT="$(mktemp -d)/"
+            WORKING_DIR_2="$(mktemp -d)"
             extract_all_QR_codes $OUTPUT $WORKING_DIR_2
             full_decode $WORKING_DIR_2 $TMP_OUT
             assert_identical $INPUT $TMP_OUT/$(basename $INPUT)
@@ -284,14 +284,14 @@ case "$ACTION" in
         rm -rf $WORKING_DIR
 
         if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
-            WORKING_DIR_2=$(mktemp -d)
+            WORKING_DIR_2="$(mktemp -d)"
             echo_verbose "doing a parchive dump"
             cp "${INPUT}" "${WORKING_DIR_2}/"
             par2 create -qq -s${QRDUMP_PARCHIVE_SIZE} -r${QRDUMP_PARCHIVE_REDUNDANCY} "${WORKING_DIR_2}/$(basename ${INPUT})"
 
             for CRRT_PAR2 in ${WORKING_DIR_2}/*\.par2; do
                 CRRT_PDF_NAME="${WORKING_DIR_2}/$(basename ${CRRT_PAR2}).pdf"
-                QRDUMP_GLOBAL_OUTPUT=$(dirname ${OUTPUT})
+                QRDUMP_GLOBAL_OUTPUT="$(dirname ${OUTPUT})"
 
                 (bash ./qrdump.sh --base64 --create-A4 --safe-mode --input "${CRRT_PAR2}" --output "${CRRT_PDF_NAME}" --metadata "parchive dump for error correction of main dump")&
                 wait $!
@@ -308,7 +308,7 @@ case "$ACTION" in
         assert_set OUTPUT
         assert_file_or_folder_exists INPUT
         assert_avail_folder OUTPUT
-        WORKING_DIR=$(mktemp -d)
+        WORKING_DIR="$(mktemp -d)"
         extract_all_QR_codes $INPUT $WORKING_DIR
         full_decode $WORKING_DIR $OUTPUT
         rm -rf $WORKING_DIR

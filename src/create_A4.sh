@@ -10,14 +10,14 @@ pad_png_image(){
     # $3 final Y size
     # $4 path to generated png
 
-    local PNG_IN=$1
-    local FINAL_X_SIZE=$2
-    local FINAL_Y_SIZE=$3
-    local PNG_OUT=$4
-    local BASE_FOLDER=$(dirname "${PNG_IN}")
+    local PNG_IN="$1"
+    local FINAL_X_SIZE="$2"
+    local FINAL_Y_SIZE="$3"
+    local PNG_OUT="$4"
+    local BASE_FOLDER="$(dirname "${PNG_IN}")"
 
-    local CRRT_PNG_X_SIZE=$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f1)
-    local CRRT_PNG_Y_SIZE=$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f2)
+    local CRRT_PNG_X_SIZE="$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f1)"
+    local CRRT_PNG_Y_SIZE="$(identify "${PNG_IN}" | awk '{print $3;}' | cut -d'x' -f2)"
 
     if [[ ${FINAL_X_SIZE} -le ${CRRT_PNG_X_SIZE} ]]
     then
@@ -31,11 +31,11 @@ pad_png_image(){
         exit 1
     fi
 
-    local ADD_RIGHT=$(( (${FINAL_X_SIZE}-${CRRT_PNG_X_SIZE}) / 2 ))
-    local ADD_LEFT=$(( ${FINAL_X_SIZE} - ${CRRT_PNG_X_SIZE} - ${ADD_RIGHT}  ))
+    local ADD_RIGHT="$(( (${FINAL_X_SIZE}-${CRRT_PNG_X_SIZE}) / 2 ))"
+    local ADD_LEFT="$(( ${FINAL_X_SIZE} - ${CRRT_PNG_X_SIZE} - ${ADD_RIGHT}  ))"
 
-    local ADD_TOP=$(( (${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE}) / 2 ))
-    local ADD_BOTTOM=$(( ${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE} - ${ADD_TOP} ))
+    local ADD_TOP="$(( (${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE}) / 2 ))"
+    local ADD_BOTTOM="$(( ${FINAL_Y_SIZE} - ${CRRT_PNG_Y_SIZE} - ${ADD_TOP} ))"
 
     convert -depth 8 -size ${ADD_LEFT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/left_margin.png
     convert -depth 8 -size ${ADD_RIGHT}x${CRRT_PNG_Y_SIZE} xc:white ${BASE_FOLDER}/right_margin.png
@@ -61,11 +61,11 @@ create_banner_of_qr_codes(){
         exit 1
     fi
 
-    local BANNER_NUMBER=$1
-    local BANNER_NUMBER_REPR=$(int_with_5_digits $BANNER_NUMBER )
-    local FOLDER_NAME=$2
+    local BANNER_NUMBER="$1"
+    local BANNER_NUMBER_REPR="$(int_with_5_digits $BANNER_NUMBER )"
+    local FOLDER_NAME="$2"
 
-    local FIRST_DATA_TO_USE=$3
+    local FIRST_DATA_TO_USE="$3"
 
     if [ "$#" -lt 4 ]
     then
@@ -73,9 +73,8 @@ create_banner_of_qr_codes(){
         convert -depth 8 -size 269x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
         local SECOND_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
     else
-        local SECOND_DATA_TO_USE=$4
+        local SECOND_DATA_TO_USE="$4"
     fi
-
 
     convert -depth 8 -size 23x269 xc:white ${FOLDER_NAME}/padding_banner_sides.png
     convert -depth 8 -size 11x269 xc:white ${FOLDER_NAME}/padding_banner_middle.png
@@ -85,7 +84,7 @@ create_banner_of_qr_codes(){
     # if some data qr codes left, generate more banners
     if [ "$#" -gt 4 ]
     then
-        local NEXT_BANNER_NUMBER=$(( ${BANNER_NUMBER} + 1 ))
+        local NEXT_BANNER_NUMBER="$(( ${BANNER_NUMBER} + 1 ))"
         shift 4
         local NEXT_LIST_DATA_QR="$*"
 
@@ -111,26 +110,26 @@ create_page_of_qr_banners(){
         exit 1
     fi
 
-    local PAGE_NUMBER=$1
-    local DISPLAYED_PAGE_NUMBER=$(( $PAGE_NUMBER + 1 ))
-    local PAGE_NUMBER_REPR=$(int_with_5_digits $DISPLAYED_PAGE_NUMBER)
-    local FOLDER_NAME=$2
+    local PAGE_NUMBER="$1"
+    local DISPLAYED_PAGE_NUMBER="$(( $PAGE_NUMBER + 1 ))"
+    local PAGE_NUMBER_REPR="$(int_with_5_digits $DISPLAYED_PAGE_NUMBER)"
+    local FOLDER_NAME="$2"
 
-    local FIRST_DATA_TO_USE=$3
+    local FIRST_DATA_TO_USE="$3"
 
     if [ "$#" -lt 5 ]
     then
         convert -depth 8 -size 595x269 xc:white ${FOLDER_NAME}/empty_padded_qr.png
         local THIRD_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
     else
-        local THIRD_DATA_TO_USE=$5
+        local THIRD_DATA_TO_USE="$5"
     fi
 
     if [ "$#" -lt 4 ]
     then
         local SECOND_DATA_TO_USE="${FOLDER_NAME}/empty_padded_qr.png"
     else
-        local SECOND_DATA_TO_USE=$4
+        local SECOND_DATA_TO_USE="$4"
     fi
 
     show_debug_variable "FIRST_DATA_TO_USE"
@@ -163,7 +162,7 @@ create_page_of_qr_banners(){
     # if some banners left, generate more banners
     if [ "$#" -gt 5 ]
     then
-        local NEXT_PAGE_NUMBER=$(( ${PAGE_NUMBER} + 1 ))
+        local NEXT_PAGE_NUMBER="$(( ${PAGE_NUMBER} + 1 ))"
         shift 5
         local NEXT_LIST_DATA_BANNER="$*"
 
@@ -179,15 +178,15 @@ assemble_into_A4(){
     local OUTPUT="$2"
     local METADATA="$3"
 
-    local TMP_DIR=$(mktemp -d)
+    local TMP_DIR="$(mktemp -d)"
     cp -r ${INPUT}/* ${TMP_DIR}/.
     sync
 
     cat "${TMP_DIR}/sha512sum.meta" | head -c 20 >> ${TMP_DIR}/metadata_for_data_pages.txt
     echo -n " $METADATA" | head -c 30 >> ${TMP_DIR}/metadata_for_data_pages.txt
 
-    local NBR_QR_CODES=$(ls -l ${TMP_DIR}/data-*\.png | wc -l)
-    local NBR_PAGES=$(( ($NBR_QR_CODES+5) / 6 + 1 ))
+    local NBR_QR_CODES="$(ls -l ${TMP_DIR}/data-*\.png | wc -l)"
+    local NBR_PAGES="$(( ($NBR_QR_CODES+5) / 6 + 1 ))"
 
     convert -depth 8 -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_TOP_MARGIN} xc:white ${TMP_DIR}/top_margin.png
     convert -depth 8 -size ${QRDUMP_A4_PIXELS_WIDTH}x${QRDUMP_A4_BOTTOM_MARGIN} xc:white ${TMP_DIR}/bottom_margin.png
@@ -201,7 +200,7 @@ assemble_into_A4(){
 
     echo "text 15,15   \"" >> ${TMP_DIR}/text_1st_page.txt
 
-    echo -n "qrdump v${QRDUMP_VERSION} | page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
+    echo -n "P 00001 | qrdump v${QRDUMP_VERSION} | page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
     echo -n " | " >> ${TMP_DIR}/text_1st_page.txt
 
     LC_TIME_old="${LC_TIME}"
@@ -244,7 +243,7 @@ assemble_into_A4(){
 
     pad_png_image ${TMP_DIR}/layout_metadata.png ${QRDUMP_A4_PIXELS_WIDTH} ${SIZE_Y_METADATA_LAYOUT} ${TMP_DIR}/metadata_layout_padded.png
 
-    local SIZE_Y_METADATA_DATA=$(( ${QRDUMP_A4_PIXELS_HEIGHT} - ${QRDUMP_A4_TEXT_HEIGHT} - ${SIZE_Y_METADATA_LAYOUT} ))
+    local SIZE_Y_METADATA_DATA="$(( ${QRDUMP_A4_PIXELS_HEIGHT} - ${QRDUMP_A4_TEXT_HEIGHT} - ${SIZE_Y_METADATA_LAYOUT} ))"
 
     pad_png_image ${TMP_DIR}/metadata.png ${QRDUMP_A4_PIXELS_WIDTH} ${SIZE_Y_METADATA_DATA} ${TMP_DIR}/metadata_data_padded.png
 
@@ -256,16 +255,16 @@ assemble_into_A4(){
 
     # pad to a slightly larger size; this is hard coded, consider to fix?
     for CRRT_FILE in ${TMP_DIR}/data-*\.png; do
-        local BASE_NAME=$(basename ${CRRT_FILE})
+        local BASE_NAME="$(basename ${CRRT_FILE})"
         pad_png_image ${CRRT_FILE} 269 269 ${TMP_DIR}/padded_${BASE_NAME}
     done
 
     # glue together 2 and 2 images to create a banner
-    local LIST_PADDED_QR_DATA=$(ls ${TMP_DIR}/padded_data-*\.png | tr '\r\n' ' ')
+    local LIST_PADDED_QR_DATA="$(ls ${TMP_DIR}/padded_data-*\.png | tr '\r\n' ' ')"
     create_banner_of_qr_codes 1 ${TMP_DIR} ${LIST_PADDED_QR_DATA}
 
     # glue together banners to create pages
-    local LIST_BANNER_QR_DATA=$(ls ${TMP_DIR}/banner_*\.png | tr '\r\n' ' ')
+    local LIST_BANNER_QR_DATA="$(ls ${TMP_DIR}/banner_*\.png | tr '\r\n' ' ')"
     create_page_of_qr_banners 1 ${TMP_DIR} ${LIST_BANNER_QR_DATA}
 
     # put all the pages together
