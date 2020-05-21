@@ -187,7 +187,10 @@ if [[ "${ACTION}" = "CreateA4" ]]; then
         echo "WARNING: running a create-A4 without --safe-mode"
     fi
     if [[ "${QRDUMP_PARCHIVE}" = "False" ]]; then
-        echo "WARNING: no --parchive dumping; this is recommended to allow robustness"
+        echo "$INPUT"
+        if [[ ! "${INPUT: -5}" == ".par2" ]]; then
+            echo "WARNING: no --parchive dumping; this is recommended to allow robustness"
+        fi
     fi
 fi
 
@@ -284,6 +287,8 @@ case "$ACTION" in
         rm -rf $WORKING_DIR
 
         if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
+            echo ""
+            echo -n "NOTE: now encoding parchive info"
             WORKING_DIR_2="$(mktemp -d)"
             echo_verbose "doing a parchive dump"
             cp "${INPUT}" "${WORKING_DIR_2}/"

@@ -222,6 +222,11 @@ assemble_into_A4(){
     cat "${TMP_DIR}/sha512sum.meta" | head -c 128 | tail -c 42 >> ${TMP_DIR}/text_1st_page.txt
     echo "" >> ${TMP_DIR}/text_1st_page.txt
 
+    local NBR_USER_META_LINES="$(echo "$METADATA" | fold -s -w 60 | wc -l)"
+    if [[ "${NBR_USER_META_LINES}" -gt 5 ]]; then
+        echo "WARNING: using too long user metadata; 1st page metadata is cut."
+    fi
+
     echo "$METADATA" | fold -s -w 60 | head -5 >> ${TMP_DIR}/text_1st_page.txt
 
     echo -n "\"" >> ${TMP_DIR}/text_1st_page.txt
