@@ -1,3 +1,15 @@
+- actively use the parchive data at decoding:
+-- print info that using par2
+-- do a par2 integrity check and if bad print error
+-- have some PAR2 metadata field to check if was dumped with PAR2
+
+- try to decrypt all pdfs and 'figure it out' even if bad / stupid names used
+
+- if using par2 to encrypt, use several processes
+- if trying to decrypt several pdfs, use several processes
+
+- do a real-world test
+
 - metadata: make sure that not too long line with a head -c
 - metadata: prepend with file name etc from the script CORRECTLY ie from the initial input
 

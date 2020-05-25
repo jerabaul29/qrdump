@@ -43,6 +43,7 @@ QRDUMP_PARCHIVE="False"
 QRDUMP_MANUAL="False"
 QRDUMP_ALLOW_WHITESPACE="False"
 QRDUMP_VERSION="0.0"
+QRDUMP_CORE_FILE="None"
 
 if [ $# -eq 0 ]; then
     echo "no argument, displaying help..."
@@ -186,17 +187,11 @@ if [[ "${ACTION}" = "CreateA4" ]]; then
     if [[ "${SAFE_MODE}" = "False" ]]; then
         echo "WARNING: running a create-A4 without --safe-mode"
     fi
-    if [[ "${QRDUMP_PARCHIVE}" = "False" ]]; then
-        echo "$INPUT"
-        if [[ ! "${INPUT: -5}" == ".par2" ]]; then
-            echo "WARNING: no --parchive dumping; this is recommended to allow robustness"
-        fi
-    fi
 fi
 
 if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
-    if [[ ! "$ACTION" = "CreateA4" ]]; then
-        echo "--parchive is only possible with --create-A4"
+    if [[ ! "$ACTION" =~ ^(ReadA4|CreateA4) ]]; then
+        echo "--parchive is only possible with --create-A4 or --read-A4"
         exit 1
     fi
 fi
@@ -220,6 +215,15 @@ else
     if [[ "${ACTION}" =~ ^(Layout|CreateA4)$ ]]; then
         echo "WARNING: metadata not set, using the defaul 'NO MSG' metadata"
         QRDUMP_METADATA="NO MSG"
+    fi
+fi
+
+if [[ "${ACTION}" =~ ^(CreateA4|ReadA4)$ ]]; then
+    if [[ "${QRDUMP_PARCHIVE}" = "False" ]]; then
+        echo "$INPUT"
+        if [[ ! "${INPUT: -5}" == ".par2" ]]; then
+            echo "WARNING: no --parchive dumping; this is recommended to allow robustness"
+        fi
     fi
 fi
 
@@ -301,7 +305,7 @@ case "$ACTION" in
                 (bash ./qrdump.sh --base64 --create-A4 --safe-mode --input "${CRRT_PAR2}" --output "${CRRT_PDF_NAME}" --metadata "parchive dump for error correction of main dump")&
                 wait $!
 
-                mv "${CRRT_PDF_NAME}" "${QRDUMP_GLOBAL_OUTPUT}/$(basename ${CRRT_PDF_NAME})"
+                mv "${CRRT_PDF_NAME}" "${QRDUMP_GLOBAL_OUTPUT}/$(basename ${OUTPUT}).$(basename ${CRRT_PDF_NAME})"
             done
 
             rm -rf $WORKING_DIR_2
@@ -314,9 +318,28 @@ case "$ACTION" in
         assert_file_or_folder_exists INPUT
         assert_avail_folder OUTPUT
         WORKING_DIR="$(mktemp -d)"
+
         extract_all_QR_codes $INPUT $WORKING_DIR
         full_decode $WORKING_DIR $OUTPUT
+
         rm -rf $WORKING_DIR
+
+        if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
+            for CRRT_PAR2_ARCHIVE in ${INPUT}*\.par2\.pdf; do
+                WORKING_DIR="$(mktemp -d)"
+
+                extract_all_QR_codes $CRRT_PAR2_ARCHIVE $WORKING_DIR
+                full_decode $WORKING_DIR $OUTPUT
+                rm -rf $WORKING_DIR
+            done
+
+            if [[ "${QRDUMP_CORE_FILE}" = "None" ]]; then
+                echo "problem attempting to par2 verify; no qrdump core file"
+                exit 1
+            else
+                par2 verify "${OUTPUT}/${QRDUMP_CORE_FILE}"
+            fi
+        fi
         ;;
 esac
 

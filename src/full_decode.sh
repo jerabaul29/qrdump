@@ -49,6 +49,10 @@ full_decode(){
         declare local "${NAME}"="${VALUE}"
     done < ${METADATA_PATH}
 
+    if [[ ! "${QRD: -5}" == ".par2" ]]; then
+        QRDUMP_CORE_FILE="$QRD"
+    fi
+
     # TODO: fix this messy thing under with file names and paths
     # assemble the final data file
     #local OUTPUT_NAME="${QRD}"
