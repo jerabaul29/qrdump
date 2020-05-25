@@ -5,7 +5,7 @@
 
 - try to decrypt all pdfs and 'figure it out' even if bad / stupid names used
 
-- if using par2 to encrypt, use several processes
+- if using par2 to encrypt, use several processes (using tmux with a parallel-tmux option?) maybe in combination with https://stackoverflow.com/questions/356100/how-to-wait-in-bash-for-several-subprocesses-to-finish-and-return-exit-code-0
 - if trying to decrypt several pdfs, use several processes
 
 - do a real-world test
