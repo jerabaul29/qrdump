@@ -37,6 +37,12 @@ The pdf_dump.pdf is easily printable (and then scannable back in many years). A 
 
 # Installation
 
+## Installation with *install.sh* script
+
+coming soon
+
+## Installation by hand
+
 - clone the repo
 
 - use the ```/src/qrdump script``` as shown in the example
