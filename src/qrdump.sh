@@ -317,8 +317,8 @@ case "$ACTION" in
         assert_set OUTPUT
         assert_file_or_folder_exists INPUT
         assert_avail_folder OUTPUT
-        echo_verbose "create tmp dir"
         WORKING_DIR="$(mktemp -d)"
+        echo_verbose "created tmp dir"
 
         extract_all_QR_codes $INPUT $WORKING_DIR
         full_decode $WORKING_DIR $OUTPUT
