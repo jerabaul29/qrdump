@@ -29,6 +29,6 @@ jobs:
       - name: quick tests
         run: |
           cd src
-          sudo bash install
+          bash install
           cd ../tests/
           bash run_all_tests.shrun_all_tests.sh
