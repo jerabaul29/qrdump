@@ -64,6 +64,19 @@ for QRDUMP_CRRT_PACKAGE in $QRDUMP_NEEDED_COMMANDS; do
 done
 
 echo "check if needed to update the rights for the convert command..."
+convert -depth 8 -size 269x269 xc:white crrt_for_test_in.png
+convert crrt_for_test_in.png crrt_for_test_in.pdf
+convert -density 72 crrt_for_test_in.pdf crrt_for_test_out.png
+if [ "$?" -ne "0" ]; then
+    echo "need to set up execute rights for ImageMagick"
+    DQT='"' 
+    SRC="rights=${DQT}none${DQT} pattern=${DQT}PDF${DQT}"
+    RPL="rights=${DQT}read\|write${DQT} pattern=${DQT}PDF${DQT}"
+    sudo sed -i "s/$SRC/$RPL/" /etc/ImageMagick-6/policy.xml
+fi
+rm crrt_for_test_in.png
+rm crrt_for_test_in.pdf
+rm crrt_for_test_out.png
 
 echo "check if need to install FreeMono fonts..."
 if [ "$(fc-list | grep FreeMono | wc -l)" -lt 2 ]; then
