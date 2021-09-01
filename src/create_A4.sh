@@ -203,11 +203,18 @@ assemble_into_A4(){
     echo -n "P 00001 | qrdump v${QRDUMP_VERSION} | page 1 / ${NBR_PAGES}" >> ${TMP_DIR}/text_1st_page.txt
     echo -n " | " >> ${TMP_DIR}/text_1st_page.txt
 
-    LC_TIME_old="${LC_TIME}"
+    if [ -z ${LC_TIME+x} ]; then
+        USE_LC_TIME="false"
+    else
+        USE_LC_TIME="true"
+        LC_TIME_old="${LC_TIME}"
+    fi
     LC_TIME="en_US.UTF-8"
     whoami >> ${TMP_DIR}/text_1st_page.txt
     date --utc >> ${TMP_DIR}/text_1st_page.txt
-    export LC_TIME="${LC_TIME_old}"
+    if [ "${USE_LC_TIME}" = "true" ]; then
+        export LC_TIME="${LC_TIME_old}"
+    fi
 
     echo "$QRDUMP_ORIGINAL_INPUT" >> ${TMP_DIR}/text_1st_page.txt
 
