@@ -25,8 +25,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      - name: install ghostscript
-        run: sudo apt-get install ghostscript
+      - name: install ghostscript and its fonts
+        run: |
+          sudo apt-get install ghostscript
+          sudo apt-get install fonts-freefont-otf
       
       # Runs a single command using the runners shell
       - name: quick tests
