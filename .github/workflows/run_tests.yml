@@ -34,6 +34,9 @@ jobs:
           SRC="rights=${DQT}none${DQT} pattern=${DQT}PDF${DQT}"
           RPL="rights=${DQT}read\|write${DQT} pattern=${DQT}PDF${DQT}"
           sudo sed -i "s/$SRC/$RPL/" /etc/ImageMagick-6/policy.xml
+          
+      - name: check fonts
+      - run: ghostscript | grep -A 5 -B 5 FreeMono
 
       # Runs a single command using the runners shell
       - name: quick tests
