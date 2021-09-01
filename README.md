@@ -37,11 +37,19 @@ The pdf_dump.pdf is easily printable (and then scannable back in many years). A 
 
 # Installation
 
-## Installation with *install.sh* script
+## Installation with **install.sh** script
 
-coming soon
+We provide an **install.sh** script. This script is focused on Debian, Ubuntu, and derived systems (for example you will need to have apt-get on your system for the script to work). Some of the steps may require sudo.
+
+To install with a single command (you may be prompted for your sudo password in the process):
+
+```
+wget https://raw.githubusercontent.com/jerabaul29/qrdump/master/src/install.sh && bash install.sh
+```
 
 ## Installation by hand
+
+To install by hand on any linux distribution (you can still see the **src/install.sh** script for an overview of the steps to perform):
 
 - clone the repo
 
