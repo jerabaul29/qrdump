@@ -36,7 +36,7 @@ jobs:
           sudo sed -i "s/$SRC/$RPL/" /etc/ImageMagick-6/policy.xml
           
       - name: check fonts
-        run: ghostscript | grep -A 5 -B 5 FreeMono
+        run: convert -list font | grep -A 5 -B 5 FreeMono
 
       # Runs a single command using the runners shell
       - name: quick tests
