@@ -23,7 +23,7 @@ echo "check for old version of qrdump-clone and clone if necessary..."
 if [ -d "qrdump-clone" ]
 then
   echo "previous version of qrdump-clone found, clean and re-install..."
-  rm -Rf qrdump-clone
+  rm -rf qrdump-clone
 fi
 
 echo "clone the repository and move into it..."
@@ -44,7 +44,8 @@ QRDUMP_NEEDED_COMMANDS="qrencode base64 zbarimg gzip gunzip split dd truncate co
 for QRDUMP_CRRT_PACKAGE in $QRDUMP_NEEDED_COMMANDS; do
     if [ -z $(which "$QRDUMP_CRRT_PACKAGE") ]; then
         echo "need to install ${QRDUMP_CRRT_PACKAGE} [requires sudo rights]..."
-        sudo apt install "${QRDUMP_CRRT_PACKAGE}"
+        sudo apt udpate
+        sudo apt install "${QRDUMP_CRRT_PACKAGE}" -y
     fi
 done
 
@@ -52,10 +53,11 @@ echo "run the tests to ensure installation validity..."
 cd tests
 bash run_all_tests.sh --quick-test
 
-echo "if all tests passed, qrdump has been well installed! If not, ask for help on the project repo."
+# TODO: if fails, make sure warning is displayed and ask to report
+# show information that is asked to report
+echo "If all tests passed, qrdump has been well installed! If not, ask for help on the project repo."
+echo "...done installing."
 
 echo "taking you back to your initial location on the system..."
 cd "${CWD}"
-
-echo "...done"
 
