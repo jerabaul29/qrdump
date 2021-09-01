@@ -91,13 +91,13 @@ fi
 echo "run the tests to ensure installation validity..."
 cd tests
 bash run_all_tests.sh --quick-test
-TESTS_RESULTS=$?
+TESTS_RESULT="$?"
 
 echo "taking you back to your initial location on the system..."
 cd "${CWD}"
 
 echo "If all tests passed, qrdump has been well installed! If not, ask for help on the project repo."
-if [ "${TESTS_RESULT}"  -eq 0 ]; then
+if [ "${TESTS_RESULT}"  -eq "0" ]; then
     echo "... done installing successfully."
     exit 0
 else
