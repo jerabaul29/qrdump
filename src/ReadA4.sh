@@ -37,18 +37,22 @@ extract_all_QR_codes(){
     local OUTPUT="$2"
 
     # split pages
+    echo_verbose "split pages"
     convert -density 72 ${INPUT} ${OUTPUT}/extracted_A4_page_%04d.png &> /dev/null
 
     # for ease, rename the metadata page
+    echo_verbose "rename metadata page"
     mv ${OUTPUT}/extracted_A4_page_0000.png ${OUTPUT}/extracted_A4_metadata.png
 
     # first metadata: QR-code about layout, Qr-code about metadata
     # TODO: do something with this
+    echo_verbose "convert to null"
     convert "${OUTPUT}/extracted_A4_metadata.png[475x250+0+0]" ${OUTPUT}/extracted_text.png &> /dev/null
     convert "${OUTPUT}/extracted_A4_metadata.png[595x300+0+250]" ${OUTPUT}/extracted_layout_metadata.png &> /dev/null
     convert "${OUTPUT}/extracted_A4_metadata.png[595x292+0+550]" ${OUTPUT}/metadata.png &> /dev/null
 
     # then the data pages
+    echo_verbose "extract data pages"
     extract_QR_codes_from_pages ${OUTPUT}
 
     # clean over numerous empty QR codes
