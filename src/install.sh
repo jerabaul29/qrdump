@@ -43,9 +43,16 @@ echo "check if some extra packages are needed..."
 QRDUMP_NEEDED_COMMANDS="qrencode base64 zbarimg gzip gunzip split dd truncate convert img2pdf par2"
 for QRDUMP_CRRT_PACKAGE in $QRDUMP_NEEDED_COMMANDS; do
     if [ -z $(which "$QRDUMP_CRRT_PACKAGE") ]; then
-        echo "need to install ${QRDUMP_CRRT_PACKAGE} [requires sudo rights]..."
-        sudo apt udpate
-        sudo apt install "${QRDUMP_CRRT_PACKAGE}" -y
+        echo "need to install a package providing ${QRDUMP_CRRT_PACKAGE} [requires sudo rights]..."
+        if [ "${QRDUMP_CRRT_PACKAGE}" == "zbarimg" ]; then
+            echo "install zbar-tools"
+            sudo apt update
+            sudo apt install zbar-tools
+        else
+            echo "install ${QRDUMP_CRRT_PACKAGE}"
+            sudo apt update
+            sudo apt install "${QRDUMP_CRRT_PACKAGE}" -y
+        fi
     fi
 done
 
