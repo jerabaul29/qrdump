@@ -39,8 +39,12 @@ echo "set up autocompletion..."
 echo "moving completion file to /etc/bash_completion.d/ [requires sudo rights]..."
 sudo cp completion/qrdump_completion.sh /etc/bash_completion.d/.
 
+# some issues with getting stuff to work in Github Actions
+sudo apt-get remove ghostscript
+sudo apt-get install ghostscript
+
 echo "check if some extra packages are needed..."
-QRDUMP_NEEDED_COMMANDS="gs qrencode base64 zbarimg gzip gunzip split dd truncate convert img2pdf par2"
+QRDUMP_NEEDED_COMMANDS="ghostscript gs qrencode base64 zbarimg gzip gunzip split dd truncate convert img2pdf par2"
 for QRDUMP_CRRT_PACKAGE in $QRDUMP_NEEDED_COMMANDS; do
     if [ -z $(which "$QRDUMP_CRRT_PACKAGE") ]; then
         echo "need to install a package providing ${QRDUMP_CRRT_PACKAGE} [requires sudo rights]..."
