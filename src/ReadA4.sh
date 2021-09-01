@@ -38,7 +38,7 @@ extract_all_QR_codes(){
 
     # split pages
     echo_verbose "split pages"
-    convert -density 72 ${INPUT} ${OUTPUT}/extracted_A4_page_%04d.png
+    convert -density 72 ${INPUT} ${OUTPUT}/extracted_A4_page_%04d.png &> /dev/null
 
     # for ease, rename the metadata page
     echo_verbose "rename metadata page"
