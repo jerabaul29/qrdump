@@ -25,18 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      - name: install ghostscript and its fonts
-        run: |
-          sudo apt-get install ghostscript
-          sudo apt-get install fonts-freefont-otf
-          
-      - name: Change ImageMagick security policy
-        run: |
-          DQT='"' 
-          SRC="rights=${DQT}none${DQT} pattern=${DQT}PDF${DQT}"
-          RPL="rights=${DQT}read\|write${DQT} pattern=${DQT}PDF${DQT}"
-          sudo sed -i "s/$SRC/$RPL/" /etc/ImageMagick-6/policy.xml
-      
       # Runs a single command using the runners shell
       - name: run all tests including slow
         run: |

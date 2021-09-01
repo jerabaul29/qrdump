@@ -68,7 +68,7 @@ convert -depth 8 -size 269x269 xc:white crrt_for_test_in.png
 convert crrt_for_test_in.png crrt_for_test_in.pdf
 convert -density 72 crrt_for_test_in.pdf crrt_for_test_out.png
 if [ "$?" -ne "0" ]; then
-    echo "need to set up execute rights for ImageMagick"
+    echo "need to set up execute rights for ImageMagick [this requires sudo]"
     DQT='"' 
     SRC="rights=${DQT}none${DQT} pattern=${DQT}PDF${DQT}"
     RPL="rights=${DQT}read\|write${DQT} pattern=${DQT}PDF${DQT}"
