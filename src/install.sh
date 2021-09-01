@@ -46,12 +46,14 @@ for QRDUMP_CRRT_PACKAGE in $QRDUMP_NEEDED_COMMANDS; do
         echo "need to install a package providing ${QRDUMP_CRRT_PACKAGE} [requires sudo rights]..."
         if [ "${QRDUMP_CRRT_PACKAGE}" == "zbarimg" ]; then
             echo "install zbar-tools"
-            sudo apt update
-            sudo apt install zbar-tools
+            sudo apt-get update
+            sudo apt-get upgrade
+            sudo apt-get install zbar-tools
         else
             echo "install ${QRDUMP_CRRT_PACKAGE}"
-            sudo apt update
-            sudo apt install "${QRDUMP_CRRT_PACKAGE}" -y
+            sudo apt-get update
+            sudo apt-get upgrade
+            sudo apt-get install "${QRDUMP_CRRT_PACKAGE}" -y
         fi
     fi
 done
