@@ -31,4 +31,4 @@ jobs:
           cd src
           bash install.sh
           cd ../tests/
-          bash run_all_tests.shrun_all_tests.sh
+          bash run_all_tests.sh
