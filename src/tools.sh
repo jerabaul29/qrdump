@@ -223,6 +223,13 @@ perform_qr_encoding(){
         fi
 
         base64 -w 0 ${FILE_TO_ENCODE} | qrencode -l M -8 -o ${DESTINATION}.png
+    else
+        if [ "${DEBUG}" = "True" ]; then
+            echo "encode $FILE_TO_ENCODE"
+            echo $(base64 -w 0 ${FILE_TO_ENCODE})
+        fi
+
+        qrencode -l M -8 -o "${DESTINATION}.png" "${FILE_TO_ENCODE}"
     fi
 }
 
@@ -238,6 +245,12 @@ perform_qr_decoding(){
 
         #NOTE: seems that sometimes some garbage is present if not using the head | awk, strange
         zbarimg --raw --quiet "${TO_DECODE}" | head -n1 | awk '{print $1;}' | base64 -d -i > "${DESTINATION}"
+    else
+        if [ "${DEBUG}" = "True" ]; then
+            echo $(zbarimg --raw --quiet "${TO_DECODE}")
+        fi
+
+        zbarimg --raw --quiet "${TO_DECODE}" | head -n1 | awk '{print $1;}' > "${DESTINATION}"
     fi
 }
 
