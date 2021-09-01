@@ -38,7 +38,7 @@ jobs:
           sudo sed -i "s/$SRC/$RPL/" /etc/ImageMagick-6/policy.xml
       
       # Runs a single command using the runners shell
-      - name: quick tests
+      - name: run all tests including slow
         run: |
           cd src
           bash install.sh
