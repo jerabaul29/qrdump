@@ -40,29 +40,16 @@ full_decode(){
     local METADATA_PATH="${TMP_DIR}/metadata.dat"
     local IFS=":"
 
-    if [[ "${ENCODING}" != "base64" ]]; then
-        while read -r NAME VALUE
-        do
-            if [[ "${NAME}" = "ID" ]]
-            then
-                echo_verbose "metadata ${NAME} is ${VALUE}"
-            fi
-            echo "${NAME}"
-            echo "${VALUE}"
-            declare local "${NAME}"="${VALUE}"
-        done < "$(cat ${METADATA_PATH})"
-    else
-        while read -r NAME VALUE
-        do
-            if [[ "${NAME}" = "ID" ]]
-            then
-                echo_verbose "metadata ${NAME} is ${VALUE}"
-            fi
-            echo "${NAME}"
-            echo "${VALUE}"
-            declare local "${NAME}"="${VALUE}"
-        done < "${METADATA_PATH}"
-    fi
+    while read -r NAME VALUE
+    do
+        if [[ "${NAME}" = "ID" ]]
+        then
+            echo_verbose "metadata ${NAME} is ${VALUE}"
+        fi
+        echo "${NAME}"
+        echo "${VALUE}"
+        declare local "${NAME}"="${VALUE}"
+    done < "${METADATA_PATH}"
 
     if [[ ! "${QRD: -5}" == ".par2" ]]; then
         QRDUMP_CORE_FILE="$QRD"

@@ -307,8 +307,13 @@ case "$ACTION" in
                 CRRT_PDF_NAME="${WORKING_DIR_2}/$(basename ${CRRT_PAR2}).pdf"
                 QRDUMP_GLOBAL_OUTPUT="$(dirname ${OUTPUT})"
 
-                (bash ./qrdump.sh --base64 --create-A4 --safe-mode --input "${CRRT_PAR2}" --output "${CRRT_PDF_NAME}" --metadata "parchive dump for error correction of main dump")&
-                wait $!
+                if [[ "${ENCODING}" = "base64" ]]; then
+                    (bash ./qrdump.sh --base64 --create-A4 --safe-mode --input "${CRRT_PAR2}" --output "${CRRT_PDF_NAME}" --metadata "parchive dump for error correction of main dump")&
+                    wait $!
+                else
+                    (bash ./qrdump.sh --create-A4 --safe-mode --input "${CRRT_PAR2}" --output "${CRRT_PDF_NAME}" --metadata "parchive dump for error correction of main dump")&
+                    wait $!
+                fi
 
                 mv "${CRRT_PDF_NAME}" "${QRDUMP_GLOBAL_OUTPUT}/$(basename ${OUTPUT}).$(basename ${CRRT_PDF_NAME})"
             done
