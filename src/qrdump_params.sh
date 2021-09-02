@@ -36,17 +36,21 @@ show_debug_variable QRDUMP_SIZE_ID
 # see for example: https://web.archive.org/web/20160326120122/http://blog.qr4.nl/page/QR-Code-Data-Capacity.aspx
 # be a bit conservative about qr code size
 # to be nice to possible bad printers
-QRDUMP_MAX_QR_SIZE=331
-show_debug_variable QRDUMP_MAX_QR_SIZE
+QRDUMP_MAX_QR_SIZE_BASE64=331
+show_debug_variable QRDUMP_MAX_QR_SIZE_BASE64
+QRDUMP_MAX_QR_SIZE_BINARY=450
+show_debug_variable QRDUMP_MAX_QR_SIZE_BINARY
 
 # the rank size in the data QR metadata
 QRDUMP_SIZE_RANK=2
 show_debug_variable QRDUMP_SIZE_RANK
 
 QRDUMP_SIZE_DATAQR_METADATA="$((${QRDUMP_SIZE_RANK}+${QRDUMP_SIZE_ID}))"
-QRDUMP_CONTENT_QR_CODE_BYTES="$((${QRDUMP_MAX_QR_SIZE}-${QRDUMP_SIZE_DATAQR_METADATA}))"
+QRDUMP_CONTENT_QR_CODE_BYTES_BASE64="$((${QRDUMP_MAX_QR_SIZE_BASE64}-${QRDUMP_SIZE_DATAQR_METADATA}))"
+QRDUMP_CONTENT_QR_CODE_BYTES_BINARY="$((${QRDUMP_MAX_QR_SIZE_BINARY}-${QRDUMP_SIZE_DATAQR_METADATA}))"
 show_debug_variable QRDUMP_SIZE_DATAQR_METADATA
-show_debug_variable QRDUMP_CONTENT_QR_CODE_BYTES
+show_debug_variable QRDUMP_CONTENT_QR_CODE_BYTES_BASE64
+show_debug_variable QRDUMP_CONTENT_QR_CODE_BYTES_BINARY
 
 # Equivalent A4 paper dimensions in pixels at 300 DPI and 72 DPI respectively are: 2480 pixels x 3508 pixels (print resolution) 595 pixels x 842 pixels (screen resolution)
 # TODO: compute with logics, allow to adapt to dpi

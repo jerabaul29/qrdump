@@ -42,7 +42,7 @@ QRDUMP_METADATA=""
 QRDUMP_PARCHIVE="False"
 QRDUMP_MANUAL="False"
 QRDUMP_ALLOW_WHITESPACE="False"
-QRDUMP_VERSION="0.0"
+QRDUMP_VERSION="1.0"
 QRDUMP_CORE_FILE="None"
 
 if [ $# -eq 0 ]; then
@@ -167,10 +167,12 @@ echo_verbose " "
 ##############################################
 
 # check using base64 for now
+echo_verbose "sanitize encoding"
 if [[ "${ENCODING}" = "binary" ]]; then
-
+    echo_verbose "using binary encoding"
     ZBARIMG_VERSION="$(zbarimg --version)"
-    dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.24"
+    dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.23.1"
+    echo_verbose "analyze version comparison"
 
     if [[ "$?" != "0" ]]; then
         echo "for zbar versions lower than 0.23.1, only base64 encoding is supported!"
@@ -184,6 +186,7 @@ elif [[ "${ENCODING}" != "base64" ]]; then
     exit 1
 fi
 
+echo_verbose "sanitize safe_mode"
 # safe mode is only offered to pdf for now
 if [[ "$SAFE_MODE" = "True" ]]; then
     if [[ ! "$ACTION" = "CreateA4" ]]; then
@@ -192,12 +195,14 @@ if [[ "$SAFE_MODE" = "True" ]]; then
     fi
 fi
 
+echo_verbose "sanitize action"
 if [[ "${ACTION}" = "CreateA4" ]]; then
     if [[ "${SAFE_MODE}" = "False" ]]; then
         echo "WARNING: running a create-A4 without --safe-mode"
     fi
 fi
 
+echo_verbose "sanitize parchive"
 if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
     if [[ ! "$ACTION" =~ ^(ReadA4|CreateA4) ]]; then
         echo "--parchive is only possible with --create-A4 or --read-A4"
@@ -206,6 +211,7 @@ if [[ "$QRDUMP_PARCHIVE" = "True" ]]; then
 fi
 
 # only support files as input; the user should zip himself if want to use on folder
+echo_verbose "sanitize input"
 if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
     if [ ! -f $INPUT ]; then
         echo "using INPUT: $INPUT"
@@ -214,6 +220,7 @@ if [[ "${ACTION}" =~ ^(Encode|CreateA4)$ ]]; then
     fi
 fi
 
+echo_verbose "sanitize metadata"
 if [ ! "$QRDUMP_METADATA" = "" ]; then
     if [[ ! "${ACTION}" =~ ^(Layout|CreateA4)$ ]]; then
         echo "using metadata, but:"
@@ -227,6 +234,7 @@ else
     fi
 fi
 
+echo_verbose "sanitize action option"
 if [[ "${ACTION}" =~ ^(CreateA4|ReadA4)$ ]]; then
     if [[ "${QRDUMP_PARCHIVE}" = "False" ]]; then
         echo "$INPUT"
@@ -239,6 +247,8 @@ fi
 ##############################################
 # call the right command                     #
 ##############################################
+
+echo_verbose "match action"
 
 case "$ACTION" in
     None)

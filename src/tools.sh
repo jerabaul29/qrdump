@@ -251,7 +251,7 @@ perform_qr_decoding(){
         zbarimg --raw --quiet "${TO_DECODE}" | head -n1 | awk '{print $1;}' | base64 -d -i > "${DESTINATION}"
     elif [[ "${ENCODING}" = "binary" ]]; then
         if [ "${DEBUG}" = "True" ]; then
-            echo $(zbarimg --raw --quiet --Sbinary "${TO_DECODE}")
+            echo $(zbarimg --raw --quiet -Sbinary "${TO_DECODE}")
         fi
 
         zbarimg --raw --quiet -Sbinary "${TO_DECODE}" > "${DESTINATION}"
