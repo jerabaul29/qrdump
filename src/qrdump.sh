@@ -167,10 +167,10 @@ echo_verbose " "
 ##############################################
 
 # check using base64 for now
-if [[ "${ENCODING}" != "base64" ]]; then
+if [[ "${ENCODING}" = "binary" ]]; then
 
     ZBARIMG_VERSION="$(zbarimg --version)"
-    dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.23"
+    dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.24"
 
     if [[ "$?" != "0" ]]; then
         echo "for zbar versions lower than 0.23.1, only base64 encoding is supported!"
@@ -178,6 +178,10 @@ if [[ "${ENCODING}" != "base64" ]]; then
         echo "Aborting..."
         exit 1
     fi
+elif [[ "${ENCODING}" != "base64" ]]; then
+    echo "Unknown encoding"
+    echo "aborting..."
+    exit 1
 fi
 
 # safe mode is only offered to pdf for now

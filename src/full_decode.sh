@@ -46,8 +46,6 @@ full_decode(){
         then
             echo_verbose "metadata ${NAME} is ${VALUE}"
         fi
-        echo "${NAME}"
-        echo "${VALUE}"
         declare local "${NAME}"="${VALUE}"
     done < "${METADATA_PATH}"
 
