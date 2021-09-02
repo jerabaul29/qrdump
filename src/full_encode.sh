@@ -26,7 +26,15 @@ full_encode(){
 
     # split the compressed file
     # into segments to be used for qr-codes.
-    split -d -a 6 -b ${QRDUMP_CONTENT_QR_CODE_BYTES} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
+    if [[ "${ENCODING}" = "base64" ]]; then
+        split -d -a 6 -b ${QRDUMP_CONTENT_QR_CODE_BYTES_BASE64} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
+    elif [[ "${ENCODING}" = "binary" ]]; then
+        split -d -a 6 -b ${QRDUMP_CONTENT_QR_CODE_BYTES_BINARY} ${TMP_DIR}/compressed.gz ${TMP_DIR}/data-
+    else
+	echo "unknown encoding"
+	echo "abort"
+	exit 1
+    fi
 
     local NBR_DATA_SEGMENTS="$(find ${TMP_DIR} -name 'data-*' | wc -l)"
     echo_verbose "split into ${NBR_DATA_SEGMENTS} segments"
@@ -78,8 +86,14 @@ full_encode(){
 
     # check that metadata is not too heavy
     # use the same size as the max qrcode choosen previously
-    if [[ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${QRDUMP_MAX_QR_SIZE} ]]; then
-        echo_verbose "*** WARNING *** looks like the metadata is dangerously big!"
+    if [[ "${ENCODING}" = "base64" ]]; then
+        if [[ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${QRDUMP_MAX_QR_SIZE_BASE64} ]]; then
+            echo_verbose "*** WARNING *** looks like the metadata is dangerously big!"
+        fi
+    elif [[ "${ENCODING}" = "binary" ]]; then
+        if [[ "$(stat --printf="%s" ${CRRT_FILE})" -gt ${QRDUMP_MAX_QR_SIZE_BINARY} ]]; then
+            echo_verbose "*** WARNING *** looks like the metadata is dangerously big!"
+        fi
     fi
 
     perform_qr_encoding "${CRRT_FILE}" "${CRRT_FILE}"

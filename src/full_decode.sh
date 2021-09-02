@@ -47,7 +47,7 @@ full_decode(){
             echo_verbose "metadata ${NAME} is ${VALUE}"
         fi
         declare local "${NAME}"="${VALUE}"
-    done < ${METADATA_PATH}
+    done < "${METADATA_PATH}"
 
     if [[ ! "${QRD: -5}" == ".par2" ]]; then
         QRDUMP_CORE_FILE="$QRD"
