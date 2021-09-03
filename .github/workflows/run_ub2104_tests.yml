@@ -19,9 +19,10 @@ jobs:
       
       - name: run all tests including slow and UB2104
         run: |
-          apt update
-          apt-get install git
-          apt-get install sudo
+          apt-get update
+          apt-get upgrade -y
+          apt-get install git -y
+          apt-get install sudo -y
           cd src
           bash install.sh
           cd ../tests/
