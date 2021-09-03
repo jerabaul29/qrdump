@@ -1,0 +1,32 @@
+name: CI_Run_UB2104_Tests_QRDUMP
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ubuntu 21.10
+    runs-on: ubuntu-latest
+    container: ubuntu:21.10
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: run all tests including slow and UB2104
+        run: |
+          export LC_ALL="en_US.UTF-8"
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+          apt-get install git -y
+          apt-get install sudo -y
+          apt-get install -y lsb-release
+          cd src
+          bash install.sh
+          cd ../tests/
+          bash run_all_tests.sh
+          bash run_all_tests_UB2104.sh
