@@ -19,6 +19,7 @@ jobs:
       
       - name: run all tests including slow and UB2104
         run: |
+          apt update
           apt-get install git
           apt-get install sudo
           cd src
