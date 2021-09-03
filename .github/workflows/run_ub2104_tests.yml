@@ -27,6 +27,7 @@ jobs:
           apt-get install -y lsb-release
           apt-get install -y dbus
           apt-get install dbus-x11 -y
+          dbus-daemon --address="unix:path=/run/dbus/system_bus_socket"
           export $(dbus-launch)
           cd src
           bash install.sh
