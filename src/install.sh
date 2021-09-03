@@ -46,18 +46,18 @@ for QRDUMP_CRRT_PACKAGE in $QRDUMP_NEEDED_COMMANDS; do
         echo "need to install a package providing ${QRDUMP_CRRT_PACKAGE} [requires sudo rights]..."
         if [ "${QRDUMP_CRRT_PACKAGE}" == "zbarimg" ]; then
             echo "install zbar-tools"
-            sudo apt-get update
-            sudo apt-get upgrade
-            sudo apt-get install zbar-tools
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
+            sudo apt-get install zbar-tools -y
         elif [ "${QRDUMP_CRRT_PACKAGE}" == "convert" ]; then
             echo "install zbar-tools"
-            sudo apt-get update
-            sudo apt-get upgrade
-            sudo apt-get install imagemagick
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
+            sudo apt-get install imagemagick -y
         else
             echo "install ${QRDUMP_CRRT_PACKAGE}"
-            sudo apt-get update
-            sudo apt-get upgrade
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
             sudo apt-get install "${QRDUMP_CRRT_PACKAGE}" -y
         fi
     fi
@@ -81,9 +81,9 @@ rm crrt_for_test_out.png
 echo "check if need to install FreeMono fonts..."
 if [ "$(fc-list | grep FreeMono | wc -l)" -lt 2 ]; then
     echo "need to install fonts..."
-    sudo apt-get update
-    sudo apt-get upgrade
-    sudo apt-get install fonts-freefont-otf
+    sudo apt-get update -y
+    sudo apt-get upgrade -y
+    sudo apt-get install fonts-freefont-otf -y
 else
     echo "no extra fonts needed..."
 fi
