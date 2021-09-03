@@ -26,8 +26,8 @@ jobs:
           apt-get install sudo -y
           apt-get install -y lsb-release
           apt-get install -y dbus
+          export $(dbus-launch)
           cd src
           bash install.sh
           cd ../tests/
-          bash run_all_tests.sh
           bash run_all_tests_UB2104.sh
