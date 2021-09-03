@@ -26,6 +26,7 @@ jobs:
           apt-get install sudo -y
           apt-get install -y lsb-release
           apt-get install -y dbus
+          apt install dbus-x11
           export $(dbus-launch)
           cd src
           bash install.sh
