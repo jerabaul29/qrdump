@@ -20,6 +20,7 @@ jobs:
       - name: run all tests including slow and UB2104
         run: |
           apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
           apt-get install git -y
           apt-get install sudo -y
           cd src
