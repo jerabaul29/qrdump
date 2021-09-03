@@ -1,0 +1,26 @@
+name: CI_Run_UB2104_Tests_QRDUMP
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ubuntu 21.04
+    runs-on: ubuntu-latest
+    container: ubuntu:21.04
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: run all tests including slow and UB2104
+        run: |
+          cd src
+          bash install.sh
+          cd ../tests/
+          bash run_all_tests.sh
+          bash run_all_tests_UB2104.sh
