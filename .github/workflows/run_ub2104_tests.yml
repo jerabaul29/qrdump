@@ -26,7 +26,6 @@ jobs:
           apt-get install sudo -y
           apt-get install -y lsb-release
           apt-get install -y dbus
-          systemctl start dbus.socket
           cd src
           bash install.sh
           cd ../tests/
