@@ -22,6 +22,8 @@ jobs:
           export LC_ALL="en_US.UTF-8"
           apt-get update
           apt-get upgrade -y
+          apt-get autoremove -y
+          sleep 30
           apt-get install sudo -y
           DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
           apt-get install git -y
