@@ -30,8 +30,8 @@ jobs:
           apt-get install git -y
           apt-get install -y lsb-release
           cd src
-          bash install.sh
           export PATH=~/bin:$PATH
+          bash install.sh
           cd ../tests/
           bash run_all_tests.sh
           bash run_all_tests_UB2104.sh
