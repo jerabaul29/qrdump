@@ -88,7 +88,7 @@ All tests passing on Ubuntu 18.04 with relevant pacakges installed.
 
 # Notes
 
-- This works for quite large files. The following example shows that dumping and restoring a 100K file is fine. Takes around half a minute on my machine. The pdf is just 55 pages long.
+- This works for quite large files. The following example shows that dumping and restoring a 100K file is fine. Takes around half a minute on my machine. The pdf is just 55 pages long. To run it from the Git sources, I can do on my machine:
 
 ```
 bash-4.4$ head -c 100k </dev/urandom > dummy.dat
@@ -97,6 +97,15 @@ total 100K
 -rw-r--r-- 1 jrlab jrlab 100K mars  31 17:58 dummy.dat
 bash-4.4$ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat
 SAFE to use: success restoring check
+```
+
+- If the ```install.sh``` script has been used so that the package is available on the system, it can be used directly as a command:
+
+```
+~$ head -c 2k </dev/urandom > dummy.dat
+~$ qrdump --create-A4 --base64 --safe-mode --output ./pdf_dump.pdf --input dummy.dat --metadata "a small test"
+/home/jrmet//dummy.dat
+SAFE to use: success restoring check on /home/jrmet//dummy.dat
 ```
 
 - Yhe metadata can be quite long, and it will be if needed cut, and wrapped, as needed, but the dump will not fail / be corrupted:

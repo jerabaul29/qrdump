@@ -30,6 +30,7 @@ echo "clone the repository and move into it..."
 git clone https://github.com/jerabaul29/qrdump qrdump-clone
 cd qrdump-clone
 
+# NOTE: if ~/bin is not in the PATH var already, it should be added
 echo "set up shortcut from ~/bin and make it executable..."
 touch ~/bin/qrdump
 echo "bash ~/bin/qrdump-clone/src/qrdump.sh \"\$@\"" > ~/bin/qrdump
