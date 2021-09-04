@@ -52,6 +52,7 @@ fi
 
 ! PARSED="$(getopt --options="$OPTIONS" --longoptions="$LONGOPTS" --name "$0" -- "$@")"
 if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
+    echo "issue with parsing of options using getopt, abort..."
     exit 2
 fi
 
@@ -171,10 +172,11 @@ echo_verbose "sanitize encoding"
 if [[ "${ENCODING}" = "binary" ]]; then
     echo_verbose "using binary encoding"
     ZBARIMG_VERSION="$(zbarimg --version)"
-    dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.23.1"
+    RES="0"
+    dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.23.1"  || RES="$?"
     echo_verbose "analyze version comparison"
 
-    if [[ "$?" != "0" ]]; then
+    if [[ "${RES}" != "0" ]]; then
         echo "for zbar versions lower than 0.23.1, only base64 encoding is supported!"
         echo "see: https://stackoverflow.com/questions/60506222"
         echo "Aborting..."

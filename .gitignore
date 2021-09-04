@@ -3,3 +3,4 @@
 *dummy*
 !tests/dummy_file.dat
 !tests/dummy_file_base64.pdf
+!tests/dummy_file_binary.pdf

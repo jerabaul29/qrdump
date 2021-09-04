@@ -31,7 +31,7 @@ bash-4.4$ sha256sum dummy.dat # the digest should be the same as the initial one
 02f2c6dd472f43e9187043271257c1bf87a2f43b771d843e45b201892d9e7b84  dummy.dat
 ```
 
-The pdf_dump.pdf is easily printable (and then scannable back in many years). A bit of metadata (page number) is present by default. Additional metadata can be added either on first page, or on the top of each page (NOTE: work in progress, TODO: implement). For example, the pdf output (shown fully with pages side-by-side) for the 4096 bytes example looks like:
+The pdf_dump.pdf is easily printable (and then scannable back in many years). A bit of metadata (page number) is present by default. Additional metadata can be added either on first page, or on the top of each page. For example, the pdf output (shown fully with pages side-by-side) for the 4096 bytes example looks like:
 
 ![Illustration of pdf output (here dump of 4096 bytes)](doc/illustration_pdf_dump/illustration_2.png?raw=true)
 
@@ -55,7 +55,7 @@ To install by hand on any linux distribution (you can still see the **src/instal
 
 - use the ```/src/qrdump script``` as shown in the example
 
-- install the packages necessary (TODO: requirements; for now, your bash will complain when commands are not available). These should be in format command: package (note: requirements is work under progress, list may not be exhaustive, open issues if stuff not working)
+- install the packages necessary. These should be in format command: package (note: requirements is work under progress, list may not be exhaustive, open issues if stuff not working)
 
 ```
 qrencode: qrencode
