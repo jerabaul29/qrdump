@@ -26,6 +26,7 @@ jobs:
           DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
           apt-get --fix-broken install
           apt-get clean
+          apt-get install sudo -y
           apt-get install git -y
           apt-get install -y lsb-release
           cd src
