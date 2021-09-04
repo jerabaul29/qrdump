@@ -107,5 +107,5 @@ bash ~/Desktop/Git/qrdump/src/qrdump.sh --create-A4 --base64 --safe-mode --outpu
 
 - Regarding encoding: ```zbarimg``` used to not support extracting binary data. This was added only recently to the tool, see: https://stackoverflow.com/questions/60506222/encode-decode-binary-data-in-a-qr-code-using-qrencode-and-zbarimg-in-bash . This is now supported in the ```zbarimg``` that ships with Ubuntu 21.04 and higher, but lower versions (such as 20.04LTS) will only work using the ```--base64``` flag. The tool will automatically warn if you try to use binary encoding while your libraries are only compatible with base64.
 
-- The tool is still early in its life, but I have been using it with success myself. If you use the ```--safe-mode``` and ```--parchive``` flags, qrdump will both 1) check that the encoded pdf can be correctly decoded, 2) dump in addition to the data all the par2 data needed to robustify the dump. Still, the tool comes with **NO WARRANTEE WHATSOEVER** from my side.
+- The tool is still early in its life, but I have been using it with success myself. If you use the ```--safe-mode``` and ```--parchive``` flags, qrdump will both 1) check that the encoded pdf can be correctly decoded, 2) dump in addition to the data all the par2 data needed to robustify the dump. Still, the tool comes with **NO WARRANTY WHATSOEVER** from my side.
 
