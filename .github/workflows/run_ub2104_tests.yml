@@ -21,9 +21,10 @@ jobs:
         run: |
           export LC_ALL="en_US.UTF-8"
           apt-get update
+          apt-get upgrade -y
+          apt-get install sudo -y
           DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
           apt-get install git -y
-          apt-get install sudo -y
           apt-get install -y lsb-release
           cd src
           bash install.sh
