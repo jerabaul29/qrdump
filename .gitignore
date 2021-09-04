@@ -1,3 +1,5 @@
 *~
 *.swp
 *dummy*
+!tests/dummy_file.dat
+!tests/dummy_file_base64.pdf
