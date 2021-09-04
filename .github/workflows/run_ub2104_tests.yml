@@ -23,6 +23,8 @@ jobs:
           apt-get update
           apt-get upgrade -y
           apt-get autoremove -y
+          apt-get --fix-broken install
+          apt-get -o Dpkg::Options::="--force-overwrite" install --fix-broken
           sleep 30
           apt-get install sudo -y
           DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
