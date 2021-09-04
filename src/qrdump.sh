@@ -172,6 +172,7 @@ echo_verbose "sanitize encoding"
 if [[ "${ENCODING}" = "binary" ]]; then
     echo_verbose "using binary encoding"
     ZBARIMG_VERSION="$(zbarimg --version)"
+    RES="0"
     dpkg --compare-versions "${ZBARIMG_VERSION}" "ge" "0.23.1"  || RES="$?"
     echo_verbose "analyze version comparison"
 
