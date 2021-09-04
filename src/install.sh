@@ -32,7 +32,7 @@ cd qrdump-clone
 
 echo "set up shortcut from ~/bin and make it executable..."
 touch ~/bin/qrdump
-echo "bash ~/bin/qrdump-clone/src/qrdump.sh" > ~/bin/qrdump
+echo "bash ~/bin/qrdump-clone/src/qrdump.sh \"$@\"" > ~/bin/qrdump
 chmod +x ~/bin/qrdump
 
 echo "set up autocompletion..."
