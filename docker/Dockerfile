@@ -1,21 +1,30 @@
-FROM ubuntu:latest
-MAINTAINER Jean Rabault (jean.rblt@gmail.com)
+FROM ubuntu:21.04
 
-RUN apt-get update --fix-missing -y && \
-    apt-get upgrade -y && \
-    apt-get install apt-utils -y && \
-    apt-get install git -y && \
-    apt-get install qrencode -y && \
-    apt-get install coreutils -y && \
-    apt-get install zbar-tools -y && \
-    apt-get install gzip -y && \
-    apt-get install imagemagick -y && \
-    apt-get install img2pdf -y && \
-    apt-get install par2 -y && \
-    apt-get autoremove -y
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN export LC_ALL="en_US.UTF-8"
+RUN LANG="en_US.utf-8"
+RUN LC_ALL="en_US.utf-8"
+RUN LC_TIME="en_US.UTF-8"
 
-RUN mkdir Git
+RUN apt-get update && apt-get install -y apt-utils
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata
 
-RUN cd Git && git clone https://github.com/jerabaul29/qrdump.git
+RUN apt-get update && apt-get install -y \
+    qrencode \
+    coreutils \
+    zbar-tools \
+    gzip \
+    imagemagick \
+    img2pdf \
+    par2 \
+    sudo \
+    git \
+    lsb-release \
+ && rm -rf /var/lib/apt/lists/*
 
-CMD cd Git/qrdump/src && bash qrdump.sh --version
+COPY . /
+
+RUN sudo bash src/install.sh || echo "true"
+RUN chmod +x /src/qrdump.sh
+
+ENTRYPOINT ["/src/qrdump.sh"]
